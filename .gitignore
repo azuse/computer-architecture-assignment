@@ -1,0 +1,6 @@
+**/.Xil/
+**/*.cache/
+**/*.runs/
+**/*.sim/sim_*/behav/
+**/vivado*.jou
+**/vivado*.log
