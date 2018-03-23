@@ -4,5 +4,6 @@
 **/*.sim/sim_*/behav/
 **/vivado*.jou
 **/vivado*.log
-**/\~\$*.doc
-**/\~\$*.doc?
+**/~$*.doc
+**/~$*.doc?
+**/~WRL*.tmp
