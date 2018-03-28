@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2018/03/26 16:04:25
+// Create Date: 2018/03/28 10:43:12
 // Design Name: 
-// Module Name: DIV
+// Module Name: test
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,14 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module DIV(
-    input [31:0] dividend,
-    input [31:0] divisor,
-    input start,
-    input clock,
-    input reset,
-    output [31:0] q,
-    output [31:0] r,
-    output busy
+module test(
+    input A,
+    input Z,
+    output B
     );
+    wire C = A ^ Z;
+    assign B = C;
 endmodule

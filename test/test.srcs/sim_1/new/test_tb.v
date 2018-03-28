@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2018/03/26 16:04:25
+// Create Date: 2018/03/28 10:43:59
 // Design Name: 
-// Module Name: DIV
+// Module Name: test_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,14 +20,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module DIV(
-    input [31:0] dividend,
-    input [31:0] divisor,
-    input start,
-    input clock,
-    input reset,
-    output [31:0] q,
-    output [31:0] r,
-    output busy
+module test_tb(
+
     );
+    reg A;
+    reg Z;
+    wire B;
+    test uut (.A(A), .Z(Z), .B(B));
+    
+    initial begin
+        A = 1;
+        Z = 0;
+        #20
+        A = 0;
+    end
 endmodule
