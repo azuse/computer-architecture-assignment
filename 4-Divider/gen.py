@@ -1,3 +1,4 @@
+#coding=utf8
 import os
 import re
 import zipfile
@@ -15,7 +16,7 @@ for root, dirs, files in os.walk("."):
         if (ext == ".v" and name != "glbl" or ext == ".mif" or ext == ".ngc" or ext[0:4] == ".doc" and name[0] != "~"):
             fileList.append(os.path.join(root, file))
             
-zf = zipfile.ZipFile("1652270-冯舜-%s.zip" % num, "w", zipfile.zlib.DEFLATED)
+zf = zipfile.ZipFile("1652270-冯舜-%s.zip".decode("utf-8") % num, "w", zipfile.zlib.DEFLATED)
 for file in fileList:
     _, fileName = os.path.split(file)
     zf.write(file, fileName)

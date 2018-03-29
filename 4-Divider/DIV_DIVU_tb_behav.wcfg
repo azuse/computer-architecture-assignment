@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="DIV_DIVU_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="DIV_DIVU_tb" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="9890000fs"></ZoomStartTime>
+      <ZoomEndTime time="85690001fs"></ZoomEndTime>
+      <Cursor1Time time="450420000fs"></Cursor1Time>
+   </zoom_setting>
+   <WVObjectSize size="12" />
+   <wvobject fp_name="/DIV_DIVU_tb/dividend" type="array">
+      <obj_property name="ElementShortName">dividend[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dividend[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/divisor" type="array">
+      <obj_property name="ElementShortName">divisor[31:0]</obj_property>
+      <obj_property name="ObjectShortName">divisor[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/clock" type="logic">
+      <obj_property name="ElementShortName">clock</obj_property>
+      <obj_property name="ObjectShortName">clock</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/quotient" type="array">
+      <obj_property name="ElementShortName">quotient[31:0]</obj_property>
+      <obj_property name="ObjectShortName">quotient[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/remainder" type="array">
+      <obj_property name="ElementShortName">remainder[31:0]</obj_property>
+      <obj_property name="ObjectShortName">remainder[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/busy" type="logic">
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/uut1/w_remainder" type="array">
+      <obj_property name="ElementShortName">w_remainder[32:0]</obj_property>
+      <obj_property name="ObjectShortName">w_remainder[32:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/uut1/w_quotient" type="array">
+      <obj_property name="ElementShortName">w_quotient[32:0]</obj_property>
+      <obj_property name="ObjectShortName">w_quotient[32:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/uut1/r_dividend" type="array">
+      <obj_property name="ElementShortName">r_dividend[32:0]</obj_property>
+      <obj_property name="ObjectShortName">r_dividend[32:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/DIV_DIVU_tb/uut1/r_divisor" type="array">
+      <obj_property name="ElementShortName">r_divisor[32:0]</obj_property>
+      <obj_property name="ObjectShortName">r_divisor[32:0]</obj_property>
+   </wvobject>
+</wave_config>
