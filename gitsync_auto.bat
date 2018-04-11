@@ -1,2 +1,2 @@
 @echo off
-call gitsync.bat
+call gitsync.bat > gitlog.log
