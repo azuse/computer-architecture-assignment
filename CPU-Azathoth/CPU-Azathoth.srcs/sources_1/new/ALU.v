@@ -5,7 +5,7 @@ module ALU(
     input [31:0] B,
     input [4:0] modeSel,        //Mode Select, one of the ALU_XXXX constants
     output reg [31:0] R,
-    output reg [31:0] RX,            //Extra result, high bits for multiplying and remainder for division
+    output reg [31:0] RX,            //Extra result, high bits for multiplication and remainder for division
 
     output isRZero,
     output reg isCarry,
@@ -55,7 +55,7 @@ module ALU(
     assign isRZero = (R == 32'h0);
     assign isRNegative = (R[31] == 1'b1);
 
-    always @(A or B or modeSel or clzResult or Blow5 or multResult or multCarry or divQuotient or divRemainder) begin
+    always @(A or B or modeSel or clzResult or Blow5 or multResult or multCarry or divQuotient or divRemainder or extendedA64Right or extendedA64Left or extendedA or extendedB) begin
         case (modeSel)
             ALU_AND: begin
                 R = A & B;
@@ -82,7 +82,7 @@ module ALU(
                 isOverflow = 0;
             end
             ALU_SL: begin
-                extendedAShifted = extendedA64Right << Blow5;   //B应只有低5位可以不为0
+                extendedAShifted = extendedA64Right << Blow5;   //B应只锟叫碉拷5位锟斤拷锟皆诧拷为0
                 R = extendedAShifted[31:0];
                 //RX = (Blow5 == 0) ? 32'h0 : {{(32 - Blow5){1'b0}}, A[31:32-Blow5]};
                 RX = extendedAShifted[63:32];
@@ -90,7 +90,7 @@ module ALU(
                 isOverflow = 0;
             end
             ALU_SRL: begin
-                extendedAShifted = extendedA64Left >> Blow5;   //B应只有低5位可以不为0
+                extendedAShifted = extendedA64Left >> Blow5;   //B应只锟叫碉拷5位锟斤拷锟皆诧拷为0
                 R = extendedAShifted[63:32];
                 //RX = ((Blow5 == 0) ? 32'h0 : {A[Blow5-1:0], {(32 - Blow5){1'b0}}});
                 RX = extendedAShifted[31:0];
@@ -98,7 +98,7 @@ module ALU(
                 isOverflow = 0;
             end
             ALU_SRA: begin
-                extendedAShifted = extendedA64Left >>> Blow5;   //B应只有低5位可以不为0
+                extendedAShifted = extendedA64Left >>> Blow5;   //B应只锟叫碉拷5位锟斤拷锟皆诧拷为0
                 R = extendedAShifted[63:32];
                 //RX = ((Blow5 == 0) ? 32'h0 : {A[Blow5-1:0], {(32 - Blow5){1'b0}}});
                 RX = extendedAShifted[31:0];
@@ -186,6 +186,7 @@ module ALU(
             
             default: begin
                 R = 0;
+                RX = 0;
                 isCarry = 0;
                 isOverflow = 0;
             end

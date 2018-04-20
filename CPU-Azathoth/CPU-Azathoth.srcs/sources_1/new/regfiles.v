@@ -52,12 +52,12 @@ module regfiles #(
     integer j;
     always @(posedge clk or negedge rst)
     begin
-        if(rst)
-                    for(j = 0; j < num; j = j + 1)
-                    begin : reset_regs
-                        loop_registers[i].r <= {(width){1'b0}};
-                    end
-        else if(we) begin
+        if(rst) begin
+            for(j = 0; j < num; j = j + 1)
+            begin : reset_regs
+                loop_registers[i].r <= {(width){1'b0}};
+            end
+        end else if(we) begin
             loop_registers[waddr].r <= wdata;
         end
     end
