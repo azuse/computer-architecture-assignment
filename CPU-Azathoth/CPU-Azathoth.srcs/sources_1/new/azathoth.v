@@ -22,7 +22,22 @@
 
 module azathoth(
     input clk,
-    input wire reset
+    input wire reset,
+    
+    output dmemAEn,
+    output [3:0] dmemAWe,
+    output [31:0] dmemAAddr,
+    output [31:0] dmemAIn,
+    input [31:0] dmemAOut,
+
+    output dmemBEn,
+    output [3:0] dmemBWe,
+    output [31:0] dmemBAddr,
+    output [31:0] dmemBIn,
+    input [31:0] dmemBOut,
+
+    output [31:0] pc,   //imemAddr
+    input [31:0] inst   //imemOut
     );
     
     ////////////////////
@@ -44,46 +59,6 @@ module azathoth(
         .isCarry(aluCarry),
         .isRNegative(aluNegative),
         .isOverflow(aluOverflow)
-    );
-    
-    ////////////////
-    /// DMEM
-    /// Port A: For Read. Work at falling edge of clk.
-    /// Port B: For Write. Work at rising edge of clk.
-    wire [3:0] dmemAWe;
-    wire [31:0] dmemAAddr;
-    wire [31:0] dmemAIn;
-    wire [31:0] dmemAOut;
-    wire [3:0] dmemBWe;
-    wire [31:0] dmemBAddr;
-    wire [31:0] dmemBIn;
-    wire [31:0] dmemBOut;
-    DMEM dmem (
-        .clka(clk),    // input wire clka
-        .wea(dmemAWe),      // input wire [3 : 0] wea
-        .addra(dmemAAddr[9:0]),  // input wire [9 : 0] addra
-        .dina(dmemAIn),    // input wire [31 : 0] dina
-        .douta(dmemAOut),  // output wire [31 : 0] douta
-        .clkb(~clk),    // input wire clkb
-        .web(dmemBWe),      // input wire [3 : 0] web
-        .addrb(dmemBAddr[9:0]),  // input wire [9 : 0] addrb
-        .dinb(dmemBIn),    // input wire [31 : 0] dinb
-        .doutb(dmemBOut)  // output wire [31 : 0] doutb
-    );
-
-    //////////////
-    /// IMEM
-    ///
-    wire imemWe;
-    wire [31:0] imemAddr;
-    wire [31:0] imemIn;
-    wire [31:0] imemOut;
-    IMEM imem (
-        .clka(clk),    // input wire clka
-        .wea(imemAddr),      // input wire [0 : 0] wea
-        .addra(imemAddr[9:0]),  // input wire [9 : 0] addra
-        .dina(imemIn),    // input wire [31 : 0] dina
-        .douta(imemOut)  // output wire [31 : 0] douta
     );
 
     ///////////////
@@ -111,5 +86,10 @@ module azathoth(
         .isSigned(extend2Signed),
         .out(extend2Out)
     );
+    
+    /////////////////////////////////////
+    /// Special structure
+    /// Instruction Decoder
+    wire [31:0] instruction;
 
 endmodule

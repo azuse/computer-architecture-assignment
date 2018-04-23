@@ -3,11 +3,9 @@ vlib activehdl
 
 vlib activehdl/xil_defaultlib
 vlib activehdl/xpm
-vlib activehdl/blk_mem_gen_v8_3_3
 
 vmap xil_defaultlib activehdl/xil_defaultlib
 vmap xpm activehdl/xpm
-vmap blk_mem_gen_v8_3_3 activehdl/blk_mem_gen_v8_3_3
 
 vlog -work xil_defaultlib -v2k5 -sv \
 "D:/SoftPath/Xilinx/Vivado/2016.2/data/ip/xpm/xpm_memory/hdl/xpm_memory_base.sv" \
@@ -21,11 +19,8 @@ vlog -work xil_defaultlib -v2k5 -sv \
 vcom -work xpm -93 \
 "D:/SoftPath/Xilinx/Vivado/2016.2/data/ip/xpm/xpm_VCOMP.vhd" \
 
-vlog -work blk_mem_gen_v8_3_3 -v2k5 \
-"../../../ipstatic/blk_mem_gen_v8_3_3/simulation/blk_mem_gen_v8_3.v" \
-
 vlog -work xil_defaultlib -v2k5 \
-"../../../../CPU-Azathoth.srcs/sources_1/ip/DMEM/sim/DMEM.v" \
+"../../../../CPU-Azathoth.srcs/sources_1/ip/DMEM/DMEM_sim_netlist.v" \
 
 vlog -work xil_defaultlib "glbl.v"
 

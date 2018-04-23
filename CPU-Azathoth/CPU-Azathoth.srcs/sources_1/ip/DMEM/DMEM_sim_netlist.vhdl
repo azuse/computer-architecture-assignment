@@ -1,10 +1,10 @@
 -- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2016.2 (win64) Build 1577090 Thu Jun  2 16:32:40 MDT 2016
--- Date        : Fri Apr 20 18:17:04 2018
+-- Date        : Mon Apr 23 09:58:35 2018
 -- Host        : SHUN-LAPTOP running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
---               d:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sources_1/ip/DMEM/DMEM_sim_netlist.vhdl
+--               D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sources_1/ip/DMEM/DMEM_sim_netlist.vhdl
 -- Design      : DMEM
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -20,6 +20,8 @@ entity DMEM_blk_mem_gen_prim_wrapper is
     doutb : out STD_LOGIC_VECTOR ( 31 downto 0 );
     clka : in STD_LOGIC;
     clkb : in STD_LOGIC;
+    ena : in STD_LOGIC;
+    enb : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 9 downto 0 );
     addrb : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -258,8 +260,8 @@ begin
       DOPBDOP(1) => \DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_91\,
       DOPBDOP(0) => \DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_92\,
       ECCPARITY(7 downto 0) => \NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_ECCPARITY_UNCONNECTED\(7 downto 0),
-      ENARDEN => '1',
-      ENBWREN => '1',
+      ENARDEN => ena,
+      ENBWREN => enb,
       INJECTDBITERR => '0',
       INJECTSBITERR => '0',
       RDADDRECC(8 downto 0) => \NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_RDADDRECC_UNCONNECTED\(8 downto 0),
@@ -285,6 +287,8 @@ entity DMEM_blk_mem_gen_prim_width is
     doutb : out STD_LOGIC_VECTOR ( 31 downto 0 );
     clka : in STD_LOGIC;
     clkb : in STD_LOGIC;
+    ena : in STD_LOGIC;
+    enb : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 9 downto 0 );
     addrb : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -308,6 +312,8 @@ begin
       dinb(31 downto 0) => dinb(31 downto 0),
       douta(31 downto 0) => douta(31 downto 0),
       doutb(31 downto 0) => doutb(31 downto 0),
+      ena => ena,
+      enb => enb,
       wea(3 downto 0) => wea(3 downto 0),
       web(3 downto 0) => web(3 downto 0)
     );
@@ -322,6 +328,8 @@ entity DMEM_blk_mem_gen_generic_cstr is
     doutb : out STD_LOGIC_VECTOR ( 31 downto 0 );
     clka : in STD_LOGIC;
     clkb : in STD_LOGIC;
+    ena : in STD_LOGIC;
+    enb : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 9 downto 0 );
     addrb : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -345,6 +353,8 @@ begin
       dinb(31 downto 0) => dinb(31 downto 0),
       douta(31 downto 0) => douta(31 downto 0),
       doutb(31 downto 0) => doutb(31 downto 0),
+      ena => ena,
+      enb => enb,
       wea(3 downto 0) => wea(3 downto 0),
       web(3 downto 0) => web(3 downto 0)
     );
@@ -359,6 +369,8 @@ entity DMEM_blk_mem_gen_top is
     doutb : out STD_LOGIC_VECTOR ( 31 downto 0 );
     clka : in STD_LOGIC;
     clkb : in STD_LOGIC;
+    ena : in STD_LOGIC;
+    enb : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 9 downto 0 );
     addrb : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -382,6 +394,8 @@ begin
       dinb(31 downto 0) => dinb(31 downto 0),
       douta(31 downto 0) => douta(31 downto 0),
       doutb(31 downto 0) => doutb(31 downto 0),
+      ena => ena,
+      enb => enb,
       wea(3 downto 0) => wea(3 downto 0),
       web(3 downto 0) => web(3 downto 0)
     );
@@ -396,6 +410,8 @@ entity DMEM_blk_mem_gen_v8_3_3_synth is
     doutb : out STD_LOGIC_VECTOR ( 31 downto 0 );
     clka : in STD_LOGIC;
     clkb : in STD_LOGIC;
+    ena : in STD_LOGIC;
+    enb : in STD_LOGIC;
     addra : in STD_LOGIC_VECTOR ( 9 downto 0 );
     addrb : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -419,6 +435,8 @@ begin
       dinb(31 downto 0) => dinb(31 downto 0),
       douta(31 downto 0) => douta(31 downto 0),
       doutb(31 downto 0) => doutb(31 downto 0),
+      ena => ena,
+      enb => enb,
       wea(3 downto 0) => wea(3 downto 0),
       web(3 downto 0) => web(3 downto 0)
     );
@@ -546,9 +564,9 @@ entity DMEM_blk_mem_gen_v8_3_3 is
   attribute C_HAS_AXI_ID : integer;
   attribute C_HAS_AXI_ID of DMEM_blk_mem_gen_v8_3_3 : entity is 0;
   attribute C_HAS_ENA : integer;
-  attribute C_HAS_ENA of DMEM_blk_mem_gen_v8_3_3 : entity is 0;
+  attribute C_HAS_ENA of DMEM_blk_mem_gen_v8_3_3 : entity is 1;
   attribute C_HAS_ENB : integer;
-  attribute C_HAS_ENB of DMEM_blk_mem_gen_v8_3_3 : entity is 0;
+  attribute C_HAS_ENB of DMEM_blk_mem_gen_v8_3_3 : entity is 1;
   attribute C_HAS_INJECTERR : integer;
   attribute C_HAS_INJECTERR of DMEM_blk_mem_gen_v8_3_3 : entity is 0;
   attribute C_HAS_MEM_OUTPUT_REGS_A : integer;
@@ -738,6 +756,8 @@ inst_blk_mem_gen: entity work.DMEM_blk_mem_gen_v8_3_3_synth
       dinb(31 downto 0) => dinb(31 downto 0),
       douta(31 downto 0) => douta(31 downto 0),
       doutb(31 downto 0) => doutb(31 downto 0),
+      ena => ena,
+      enb => enb,
       wea(3 downto 0) => wea(3 downto 0),
       web(3 downto 0) => web(3 downto 0)
     );
@@ -749,11 +769,13 @@ use UNISIM.VCOMPONENTS.ALL;
 entity DMEM is
   port (
     clka : in STD_LOGIC;
+    ena : in STD_LOGIC;
     wea : in STD_LOGIC_VECTOR ( 3 downto 0 );
     addra : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
     douta : out STD_LOGIC_VECTOR ( 31 downto 0 );
     clkb : in STD_LOGIC;
+    enb : in STD_LOGIC;
     web : in STD_LOGIC_VECTOR ( 3 downto 0 );
     addrb : in STD_LOGIC_VECTOR ( 9 downto 0 );
     dinb : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -842,9 +864,9 @@ architecture STRUCTURE of DMEM is
   attribute C_HAS_AXI_ID : integer;
   attribute C_HAS_AXI_ID of U0 : label is 0;
   attribute C_HAS_ENA : integer;
-  attribute C_HAS_ENA of U0 : label is 0;
+  attribute C_HAS_ENA of U0 : label is 1;
   attribute C_HAS_ENB : integer;
-  attribute C_HAS_ENB of U0 : label is 0;
+  attribute C_HAS_ENB of U0 : label is 1;
   attribute C_HAS_INJECTERR : integer;
   attribute C_HAS_INJECTERR of U0 : label is 0;
   attribute C_HAS_MEM_OUTPUT_REGS_A : integer;
@@ -952,8 +974,8 @@ U0: entity work.DMEM_blk_mem_gen_v8_3_3
       douta(31 downto 0) => douta(31 downto 0),
       doutb(31 downto 0) => doutb(31 downto 0),
       eccpipece => '0',
-      ena => '0',
-      enb => '0',
+      ena => ena,
+      enb => enb,
       injectdbiterr => '0',
       injectsbiterr => '0',
       rdaddrecc(9 downto 0) => NLW_U0_rdaddrecc_UNCONNECTED(9 downto 0),

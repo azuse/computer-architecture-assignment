@@ -1,10 +1,10 @@
 // Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2016.2 (win64) Build 1577090 Thu Jun  2 16:32:40 MDT 2016
-// Date        : Fri Apr 20 18:17:04 2018
+// Date        : Mon Apr 23 09:58:35 2018
 // Host        : SHUN-LAPTOP running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode funcsim
-//               d:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sources_1/ip/DMEM/DMEM_sim_netlist.v
+//               D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sources_1/ip/DMEM/DMEM_sim_netlist.v
 // Design      : DMEM
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -16,21 +16,25 @@
 (* NotValidForBitStream *)
 module DMEM
    (clka,
+    ena,
     wea,
     addra,
     dina,
     douta,
     clkb,
+    enb,
     web,
     addrb,
     dinb,
     doutb);
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTA CLK" *) input clka;
+  (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTA EN" *) input ena;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTA WE" *) input [3:0]wea;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTA ADDR" *) input [9:0]addra;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTA DIN" *) input [31:0]dina;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTA DOUT" *) output [31:0]douta;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTB CLK" *) input clkb;
+  (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTB EN" *) input enb;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTB WE" *) input [3:0]web;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTB ADDR" *) input [9:0]addrb;
   (* x_interface_info = "xilinx.com:interface:bram:1.0 BRAM_PORTB DIN" *) input [31:0]dinb;
@@ -44,6 +48,8 @@ module DMEM
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
   wire NLW_U0_dbiterr_UNCONNECTED;
@@ -92,8 +98,8 @@ module DMEM
   (* C_EST_POWER_SUMMARY = "Estimated Power for IP     :     5.9299 mW" *) 
   (* C_FAMILY = "artix7" *) 
   (* C_HAS_AXI_ID = "0" *) 
-  (* C_HAS_ENA = "0" *) 
-  (* C_HAS_ENB = "0" *) 
+  (* C_HAS_ENA = "1" *) 
+  (* C_HAS_ENB = "1" *) 
   (* C_HAS_INJECTERR = "0" *) 
   (* C_HAS_MEM_OUTPUT_REGS_A = "0" *) 
   (* C_HAS_MEM_OUTPUT_REGS_B = "0" *) 
@@ -153,8 +159,8 @@ module DMEM
         .douta(douta),
         .doutb(doutb),
         .eccpipece(1'b0),
-        .ena(1'b0),
-        .enb(1'b0),
+        .ena(ena),
+        .enb(enb),
         .injectdbiterr(1'b0),
         .injectsbiterr(1'b0),
         .rdaddrecc(NLW_U0_rdaddrecc_UNCONNECTED[9:0]),
@@ -213,6 +219,8 @@ module DMEM_blk_mem_gen_generic_cstr
     doutb,
     clka,
     clkb,
+    ena,
+    enb,
     addra,
     addrb,
     dina,
@@ -223,6 +231,8 @@ module DMEM_blk_mem_gen_generic_cstr
   output [31:0]doutb;
   input clka;
   input clkb;
+  input ena;
+  input enb;
   input [9:0]addra;
   input [9:0]addrb;
   input [31:0]dina;
@@ -238,6 +248,8 @@ module DMEM_blk_mem_gen_generic_cstr
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
 
@@ -250,6 +262,8 @@ module DMEM_blk_mem_gen_generic_cstr
         .dinb(dinb),
         .douta(douta),
         .doutb(doutb),
+        .ena(ena),
+        .enb(enb),
         .wea(wea),
         .web(web));
 endmodule
@@ -260,6 +274,8 @@ module DMEM_blk_mem_gen_prim_width
     doutb,
     clka,
     clkb,
+    ena,
+    enb,
     addra,
     addrb,
     dina,
@@ -270,6 +286,8 @@ module DMEM_blk_mem_gen_prim_width
   output [31:0]doutb;
   input clka;
   input clkb;
+  input ena;
+  input enb;
   input [9:0]addra;
   input [9:0]addrb;
   input [31:0]dina;
@@ -285,6 +303,8 @@ module DMEM_blk_mem_gen_prim_width
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
 
@@ -297,6 +317,8 @@ module DMEM_blk_mem_gen_prim_width
         .dinb(dinb),
         .douta(douta),
         .doutb(doutb),
+        .ena(ena),
+        .enb(enb),
         .wea(wea),
         .web(web));
 endmodule
@@ -307,6 +329,8 @@ module DMEM_blk_mem_gen_prim_wrapper
     doutb,
     clka,
     clkb,
+    ena,
+    enb,
     addra,
     addrb,
     dina,
@@ -317,6 +341,8 @@ module DMEM_blk_mem_gen_prim_wrapper
   output [31:0]doutb;
   input clka;
   input clkb;
+  input ena;
+  input enb;
   input [9:0]addra;
   input [9:0]addrb;
   input [31:0]dina;
@@ -340,6 +366,8 @@ module DMEM_blk_mem_gen_prim_wrapper
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
   wire \NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_CASCADEOUTA_UNCONNECTED ;
@@ -546,8 +574,8 @@ module DMEM_blk_mem_gen_prim_wrapper
         .DOPADOP({\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_85 ,\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_86 ,\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_87 ,\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_88 }),
         .DOPBDOP({\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_89 ,\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_90 ,\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_91 ,\DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_n_92 }),
         .ECCPARITY(\NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_ECCPARITY_UNCONNECTED [7:0]),
-        .ENARDEN(1'b1),
-        .ENBWREN(1'b1),
+        .ENARDEN(ena),
+        .ENBWREN(enb),
         .INJECTDBITERR(1'b0),
         .INJECTSBITERR(1'b0),
         .RDADDRECC(\NLW_DEVICE_7SERIES.NO_BMM_INFO.TRUE_DP.SIMPLE_PRIM36.ram_RDADDRECC_UNCONNECTED [8:0]),
@@ -568,6 +596,8 @@ module DMEM_blk_mem_gen_top
     doutb,
     clka,
     clkb,
+    ena,
+    enb,
     addra,
     addrb,
     dina,
@@ -578,6 +608,8 @@ module DMEM_blk_mem_gen_top
   output [31:0]doutb;
   input clka;
   input clkb;
+  input ena;
+  input enb;
   input [9:0]addra;
   input [9:0]addrb;
   input [31:0]dina;
@@ -593,6 +625,8 @@ module DMEM_blk_mem_gen_top
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
 
@@ -605,6 +639,8 @@ module DMEM_blk_mem_gen_top
         .dinb(dinb),
         .douta(douta),
         .doutb(doutb),
+        .ena(ena),
+        .enb(enb),
         .wea(wea),
         .web(web));
 endmodule
@@ -617,8 +653,8 @@ endmodule
 (* C_ENABLE_32BIT_ADDRESS = "0" *) (* C_EN_DEEPSLEEP_PIN = "0" *) (* C_EN_ECC_PIPE = "0" *) 
 (* C_EN_RDADDRA_CHG = "0" *) (* C_EN_RDADDRB_CHG = "0" *) (* C_EN_SAFETY_CKT = "0" *) 
 (* C_EN_SHUTDOWN_PIN = "0" *) (* C_EN_SLEEP_PIN = "0" *) (* C_EST_POWER_SUMMARY = "Estimated Power for IP     :     5.9299 mW" *) 
-(* C_FAMILY = "artix7" *) (* C_HAS_AXI_ID = "0" *) (* C_HAS_ENA = "0" *) 
-(* C_HAS_ENB = "0" *) (* C_HAS_INJECTERR = "0" *) (* C_HAS_MEM_OUTPUT_REGS_A = "0" *) 
+(* C_FAMILY = "artix7" *) (* C_HAS_AXI_ID = "0" *) (* C_HAS_ENA = "1" *) 
+(* C_HAS_ENB = "1" *) (* C_HAS_INJECTERR = "0" *) (* C_HAS_MEM_OUTPUT_REGS_A = "0" *) 
 (* C_HAS_MEM_OUTPUT_REGS_B = "0" *) (* C_HAS_MUX_OUTPUT_REGS_A = "0" *) (* C_HAS_MUX_OUTPUT_REGS_B = "0" *) 
 (* C_HAS_REGCEA = "0" *) (* C_HAS_REGCEB = "0" *) (* C_HAS_RSTA = "0" *) 
 (* C_HAS_RSTB = "0" *) (* C_HAS_SOFTECC_INPUT_REGS_A = "0" *) (* C_HAS_SOFTECC_OUTPUT_REGS_B = "0" *) 
@@ -771,6 +807,8 @@ module DMEM_blk_mem_gen_v8_3_3
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
 
@@ -861,6 +899,8 @@ module DMEM_blk_mem_gen_v8_3_3
         .dinb(dinb),
         .douta(douta),
         .doutb(doutb),
+        .ena(ena),
+        .enb(enb),
         .wea(wea),
         .web(web));
 endmodule
@@ -871,6 +911,8 @@ module DMEM_blk_mem_gen_v8_3_3_synth
     doutb,
     clka,
     clkb,
+    ena,
+    enb,
     addra,
     addrb,
     dina,
@@ -881,6 +923,8 @@ module DMEM_blk_mem_gen_v8_3_3_synth
   output [31:0]doutb;
   input clka;
   input clkb;
+  input ena;
+  input enb;
   input [9:0]addra;
   input [9:0]addrb;
   input [31:0]dina;
@@ -896,6 +940,8 @@ module DMEM_blk_mem_gen_v8_3_3_synth
   wire [31:0]dinb;
   wire [31:0]douta;
   wire [31:0]doutb;
+  wire ena;
+  wire enb;
   wire [3:0]wea;
   wire [3:0]web;
 
@@ -908,6 +954,8 @@ module DMEM_blk_mem_gen_v8_3_3_synth
         .dinb(dinb),
         .douta(douta),
         .doutb(doutb),
+        .ena(ena),
+        .enb(enb),
         .wea(wea),
         .web(web));
 endmodule
