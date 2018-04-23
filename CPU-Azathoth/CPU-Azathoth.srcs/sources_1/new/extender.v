@@ -41,7 +41,9 @@ module extender (
             29: out = {{(32-29){paddingBit}}, in[29-1:0]};
             30: out = {{(32-30){paddingBit}}, in[30-1:0]};
             31: out = {{(32-31){paddingBit}}, in[31-1:0]};
-            32: out = {{(32-32){paddingBit}}, in[32-1:0]};
+            32: out = in[32-1:0];
+            default:
+                out = 32'hFFFFFFFF;
         endcase
     end
 endmodule

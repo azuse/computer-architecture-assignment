@@ -55,7 +55,7 @@ module ALU(
     assign isRZero = (R == 32'h0);
     assign isRNegative = (R[31] == 1'b1);
 
-    always @(A or B or modeSel or clzResult or Blow5 or multResult or multCarry or divQuotient or divRemainder or extendedA64Right or extendedA64Left or extendedA or extendedB) begin
+    always @(*) begin
         case (modeSel)
             ALU_AND: begin
                 R = A & B;

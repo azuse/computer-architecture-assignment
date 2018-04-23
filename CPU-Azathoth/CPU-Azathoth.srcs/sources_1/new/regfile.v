@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module regfiles #(
+module regfile #(
     parameter num = 32,
     parameter width = 32,
     parameter numlog = 5
@@ -36,29 +36,24 @@ module regfiles #(
     input [width-1:0] wdata
     );
 
-    generate
-        genvar i;
+    reg [width - 1:0] array_reg [0:num - 1];
 
-        for(i = 0; i < num; i = i + 1)
-        begin : loop_registers
-            reg [width-1:0] r;
-        end
-
-    endgenerate
-
-    assign rdata1 = loop_registers[raddr1].r;
-    assign rdata2 = loop_registers[raddr2].r;
+    assign rdata1 = array_reg[raddr1];
+    assign rdata2 = array_reg[raddr2];
 
     integer j;
-    always @(posedge clk or negedge rst)
+    always @(posedge clk or posedge rst)
     begin
         if(rst) begin
             for(j = 0; j < num; j = j + 1)
             begin : reset_regs
-                loop_registers[i].r <= {(width){1'b0}};
+                array_reg[i] <= {(width){1'b0}};
             end
         end else if(we) begin
-            loop_registers[waddr].r <= wdata;
+            if(waddr == 0)  // zero register $zero
+                array_reg[waddr] <= {(width){1'b0}};
+            else
+                array_reg[waddr] <= wdata;
         end
     end
 endmodule
