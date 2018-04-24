@@ -1,16 +1,20 @@
 module sccomp_dataflow(
     input clk_in,
+    input clk_afterDiv,
     input reset,
+    input cpuEna_n,
     output [31:0] inst,
     output [31:0] pc,
-    output [31:0] addr
+    output [31:0] addr,
+    output cpuRunning
 );
 
     wire clk;
+    
     //////////////////
     /// Frequency divider
     cpu_div #(1) cpu_clk(clk_in, reset, clk);
-
+    assign clk_afterDiv = clk;
 
     ////////////////
     /// DMEM
@@ -109,11 +113,13 @@ module sccomp_dataflow(
     azathoth sccpu(
         .clk(clk),
         .reset(reset),
+        .ena(~cpuEna_n),
         .dmemAEn(dmemAEn),
         .dmemAWe(dmemAWe),
         .dmemAAddr(dmemAAddr),
         .dmemAIn(dmemAIn),
         .dmemAOut(dmemAOut_Selected),
+        .cpuRunning(cpuRunning),
         .pc(imemAddr),
         .inst(imemOut)
     );
