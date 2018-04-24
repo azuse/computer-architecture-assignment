@@ -1,0 +1,5 @@
+Parsing file: 35_jalr.hex.txt 
+
+sll $0, 0
+lui $at, 64
+addi $at, $at, 24

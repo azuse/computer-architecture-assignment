@@ -1,0 +1,3 @@
+Parsing file: 14_jal.hex.txt 
+
+sll $0, 0

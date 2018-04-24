@@ -60,13 +60,7 @@ DMEM your_instance_name (
   .wea(wea),      // input wire [3 : 0] wea
   .addra(addra),  // input wire [9 : 0] addra
   .dina(dina),    // input wire [31 : 0] dina
-  .douta(douta),  // output wire [31 : 0] douta
-  .clkb(clkb),    // input wire clkb
-  .enb(enb),      // input wire enb
-  .web(web),      // input wire [3 : 0] web
-  .addrb(addrb),  // input wire [9 : 0] addrb
-  .dinb(dinb),    // input wire [31 : 0] dinb
-  .doutb(doutb)  // output wire [31 : 0] doutb
+  .douta(douta)  // output wire [31 : 0] douta
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------
 

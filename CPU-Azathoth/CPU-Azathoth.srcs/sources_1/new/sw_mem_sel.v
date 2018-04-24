@@ -1,5 +1,5 @@
 module sw_mem_sel(
-    input [31:0] switch_cs,
+    input switch_cs,
     input [15:0] sw,
     input [31:0] originalData,
     output [31:0] selectedData

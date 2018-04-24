@@ -1,0 +1,5 @@
+Parsing file: 49_multu.hex.txt 
+
+sll $0, 0
+addi $at, $0, 15
+addi $v0, $0, 7

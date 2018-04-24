@@ -1,0 +1,68 @@
+Parsing file: 29_slt.hex.txt 
+
+sll $0, 0
+addi $0, $0, 0
+addi $at, $0, 1
+addi $v0, $0, 65535
+lui $v1, -32768
+lui $a0, 21845
+addi $a0, $at, 21845
+lui $a1, -21846
+addi $a1, $at, 43690
+addi $a2, $0, 0
+addi $a3, $0, 4369
+addi $t0, $0, 4369
+addi $t1, $0, 4369
+addi $t2, $0, 4369
+addi $t3, $0, 4369
+addi $t4, $0, 32768
+addi $t5, $0, 32768
+addi $t16, $0, 32768
+addi $t17, $0, 32768
+addi $s0, $0, 32768
+addi $s1, $0, 65535
+addi $s2, $0, 65535
+addi $s3, $0, 65535
+addi $s4, $0, 65535
+addi $s5, $0, 65535
+lui $s6, -32768
+lui $s7, -32768
+lui $t8, -32768
+lui $t9, -32768
+lui $k0, -32768
+lui $k1, -21846
+lui $gp, -21846
+lui $sp, -21846
+lui $fp, -21846
+lui $ra, -21846
+slt $0, $0, $at
+slt $a3, $at, $a3
+slt $t0, $v0, $t0
+slt $t1, $v1, $t1
+slt $t2, $a0, $t2
+slt $t3, $a1, $t3
+slt $t4, $at, $t4
+slt $t5, $v0, $t5
+slt $t16, $v1, $t16
+slt $t17, $a0, $t17
+slt $s0, $a1, $s0
+slt $s1, $at, $s1
+slt $s2, $v0, $s2
+slt $s3, $v1, $s3
+slt $s4, $a0, $s4
+slt $s5, $a1, $s5
+slt $s6, $at, $s6
+slt $s7, $v0, $s7
+slt $t8, $v1, $t8
+slt $t9, $a0, $t9
+slt $k0, $a1, $k0
+slt $k1, $at, $k1
+slt $gp, $v0, $gp
+slt $sp, $v1, $sp
+slt $fp, $a0, $fp
+slt $ra, $a1, $ra
+slt $at, $a2, $at
+slt $v0, $a2, $at
+slt $v1, $a2, $at
+slt $a0, $a2, $at
+slt $a1, $a2, $at

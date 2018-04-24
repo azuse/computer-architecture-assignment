@@ -30,23 +30,19 @@ module azathoth(
     output reg [31:0] dmemAIn,
     input [31:0] dmemAOut,
 
-    output reg dmemBEn,
-    output reg [3:0] dmemBWe,
-    output reg [31:0] dmemBAddr,
-    output reg [31:0] dmemBIn,
-    input [31:0] dmemBOut,
-
     output reg [31:0] pc,   //imemAddr
     input [31:0] inst   //imemOut
     );
+    
+    `include "aluHeader.vh"
     
     ////////////////////
     /// Parts Instantiating
     /// Register File
     reg rfWe;
-    reg [31:0] rfRAddr1;
-    reg [31:0] rfRAddr2;
-    reg [31:0] rfWAddr;
+    reg [4:0] rfRAddr1;
+    reg [4:0] rfRAddr2;
+    reg [4:0] rfWAddr;
     reg [31:0] rfWData;
 
     wire [31:0] rfRData1;
@@ -115,6 +111,7 @@ module azathoth(
     wire [5:0] op = inst[31:26];
     wire [5:0] func = inst[5:0];
     wire [4:0] rs = inst[25:21];
+    wire [4:0] base = inst[25:21];
     wire [4:0] rt = inst[20:16];
     wire [4:0] rd = inst[15:11];
     wire [4:0] shamt = inst[10:6];
@@ -214,6 +211,8 @@ module azathoth(
     /// PC is defined at I/O ports.
     reg [31:0] hi;
     reg [31:0] lo;
+    reg [31:0] nextHi;
+    reg [31:0] nextLo;
 
     /////////////////////////
     /// Main Block
@@ -232,32 +231,13 @@ module azathoth(
         if(reset == 1'b1) begin
             allowStart <= 0;
             startCounter <= 0;
-            hi <= 0;
-            lo <= 0;
-            nextPC <= initInstAddr;
-
-            dmemAEn <= 0;
-            dmemAWe <= 4'h0;
-            dmemAAddr <= initDataAddr;
-            dmemAIn <= 32'hffffffff;
-
-            dmemBEn <= 0;
-            dmemBWe <= 4'h0;
-            dmemBAddr <= initDataAddr;
-            dmemBIn <= 32'hEEEEEEEE;
-            
-            rfWe <= 0;
-            rfRAddr1 <= 0;
-            rfRAddr2 <= 0;
-            rfWAddr <= 0;
-            rfWData <= 0;
-
         end
         else
         begin
             if(allowStart == 0) begin
                 if(startCounter < startNo - 1) begin
                     startCounter <= startCounter + 1;
+                end
                 else if (startCounter >= startNo - 1) begin
                     startCounter <= startNo - 1;
                     allowStart <= 1'b1;
@@ -265,12 +245,8 @@ module azathoth(
                 end
             end else begin
                 allowStart <= 1'b1;
-                if(iAdd) begin
-                    
             end
         end
-
-
     end
 
 
@@ -278,13 +254,19 @@ module azathoth(
     always @(negedge clk or posedge reset) begin
         if(reset == 1'b1) begin
             pc <= initInstAddr;
+            hi <= 0;
+            lo <= 0;
         end
         else
         begin
             if(allowStart == 0) begin
                 pc <= initInstAddr;
+                hi <= 0;
+                lo <= 0;
             end else begin
                 pc <= nextPC;
+                lo <= nextLo;
+                hi <= nextHi;
             end
         end
 
@@ -293,6 +275,11 @@ module azathoth(
 
     /// Deciding nextPC
     reg [31:0] epc;
+    
+    always @(*) begin
+        epc = 32'habcdef12;
+    end
+    
     always @(*) begin
         if(iJr)
             nextPC = rfRData1;  //GPR[rs]
@@ -301,9 +288,9 @@ module azathoth(
         else if (iBne)
             nextPC = aluR[0] ? pcNextInst : uaddR;
         else if (iJ)
-            nextPC = {pc[31:28], inst[25:0], 2'b0};
+            nextPC = {pc[31:28], index, 2'b0};
         else if (iJal)
-            nextPC = {pc[31:28], inst[25:0], 2'b0};
+            nextPC = {pc[31:28], index, 2'b0};
         else if (iBgez)
             nextPC = rfRData1[31] ? pcNextInst : uaddR;     //GPR[rs]
         else if (iJalr)
@@ -321,13 +308,44 @@ module azathoth(
     end
 
     // Instruction-specific datapath
+    reg [4:0] byte;
+    reg [31:0] exec_addr;
+    reg trap;
+    localparam BigEndianCPU = 1'b0;
     always @(*) begin
+        exec_addr = 0;
+        trap = 0;
+
         extend1In = 0;
         extend1NOB = 32;
         extend1Signed = 1'b1;
         extend2In = 0;
         extend2NOB = 32;
         extend2Signed = 1'b1;
+        dmemAWe = 4'h0;
+        dmemAEn = 1'b0;
+        dmemAIn = 32'haaaaaaaa;
+        dmemAAddr = initDataAddr;
+
+        rfRAddr1 = 0;
+        rfRAddr2 = 0;
+
+        byte = 5'bxxxxx;
+
+        aluA = 0;
+        aluB = 0;
+        aluModeSel = ALU_AND;
+
+        rfWe = 1'b0;
+        rfWAddr = 0;
+        rfWData = 32'haaaaaaaa;
+
+        nextHi = hi;
+        nextLo = lo;
+        
+        uaddA = 32'hbbbbbbbb;
+        uaddB = 32'hcccccccc;
+        
         if(iAdd) begin
             rfRAddr1 = rs;
             rfRAddr2 = rt;
@@ -495,10 +513,6 @@ module azathoth(
             aluA = 0;
             aluB = 0;
             aluModeSel = ALU_AND;
-
-            rfWe = 1'b0;
-            rfWAddr = 0;
-            rfWData = 0;
         end else if (iAddi) begin
             rfRAddr1 = rs;
             rfRAddr2 = 0;
@@ -538,4 +552,356 @@ module azathoth(
             rfWe = 1'b1;
             rfWAddr = rt;
             rfWData = aluR;
+        end else if (iOri) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = 0;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b0;
+            aluA = rfRData1;
+            aluB = extend1Out;
+            aluModeSel = ALU_OR;
+
+            rfWe = 1'b1;
+            rfWAddr = rt;
+            rfWData = aluR;
+        end else if (iXori) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = 0;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b0;
+            aluA = rfRData1;
+            aluB = extend1Out;
+            aluModeSel = ALU_XOR;
+
+            rfWe = 1'b1;
+            rfWAddr = rt;
+            rfWData = aluR;
+        end else if (iLw) begin
+            rfRAddr1 = base;
+            rfRAddr2 = 0;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            aluA = rfRData1;
+            aluB = extend1Out;
+            aluModeSel = ALU_UADD;
+
+            dmemAEn = 1'b1;
+            dmemAAddr = aluR;
+
+            rfWe = 1'b1;
+            rfWAddr = rt;
+            rfWData = dmemAOut;
+        end else if (iSw) begin
+            rfRAddr1 = base;
+            rfRAddr2 = rt;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            aluA = rfRData1;
+            aluB = extend1Out;
+            aluModeSel = ALU_UADD;
+
+            dmemAEn = 1'b0;
+            dmemAWe = 4'hf;
+            dmemAAddr = aluR;
+            dmemAIn = rfRData2;
+        end else if (iBeq || iBne) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            aluA = rfRData1;
+            aluB = rfRData2;
+            aluModeSel = ALU_EQU;
+
+            uaddA = pcNextInst;
+            uaddB = extend1Out << 2;
+        end else if (iSlti) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = 0;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            aluA = rfRData1;
+            aluB = extend1Out;
+            aluModeSel = ALU_SLES;
+
+            rfWe = 1'b1;
+            rfWAddr = rt;
+            rfWData = aluR;
+        end else if (iSltiu) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = 0;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            aluA = rfRData1;
+            aluB = extend1Out;
+            aluModeSel = ALU_ULES;
+
+            rfWe = 1'b1;
+            rfWAddr = rt;
+            rfWData = aluR;
+        end else if (iLui) begin
+            rfRAddr1 = 0;
+            rfRAddr2 = 0;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b0;
+            aluA = 0;
+            aluB = 0;
+            aluModeSel = ALU_AND;
+
+            rfWe = 1'b1;
+            rfWAddr = rt;
+            rfWData = extend1Out;
+        end else if (iJ) begin
+            rfRAddr1 = 0;   // Do nothing
+        end else if (iJal) begin
+            rfWe = 1'b1;
+            rfWAddr = 31;
+            rfWData = pcNextInst;
+        end else if (iDiv) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
+            aluA = rfRData1;
+            aluB = rfRData2;
+            aluModeSel = ALU_SDIV;
+            
+            nextHi = aluRX;
+            nextLo = aluR;
+        end else if (iDivu) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
+            aluA = rfRData1;
+            aluB = rfRData2;
+            aluModeSel = ALU_UDIV;
+            
+            nextHi = aluRX;
+            nextLo = aluR;
+        end else if (iMult) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
+            aluA = rfRData1;
+            aluB = rfRData2;
+            aluModeSel = ALU_SMUL;
+            
+            nextHi = aluRX;
+            nextLo = aluR;
+        end else if (iMultu) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
+            aluA = rfRData1;
+            aluB = rfRData2;
+            aluModeSel = ALU_UMUL;
+            
+            nextHi = aluRX;
+            nextLo = aluR;
+        end else if (iBgez) begin
+            rfRAddr1 = rs;
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = pcNextInst;
+            uaddB = extend1Out;
+        end else if (iJalr) begin
+            rfRAddr1 = rs;
+            rfWe = 1'b1;
+            rfWAddr = rd;
+            rfWData = pcNextInst;
+        end else if (iLbu) begin
+            rfRAddr1 = base;
+            rfWAddr = rt;
+            rfWe = 1'b1;
+
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = extend1Out;
+            uaddB = rfRData1;
+
+            dmemAAddr = uaddR;
+            dmemAEn = 1'b1;
+
+            byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
+
+            extend2In = dmemAOut[8 * byte +: 8];
+            extend2NOB = 8;
+            extend2Signed = 0;
+
+            rfWData = extend2Out;
+        end else if (iLhu) begin
+            rfRAddr1 = base;
+            rfWAddr = rt;
+            rfWe = 1'b1;
+
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = extend1Out;
+            uaddB = rfRData1;
+
+            dmemAAddr = uaddR;
+            dmemAEn = 1'b1;
+
+            //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+            byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+
+            extend2In = dmemAOut[8 * byte +: 16];
+            extend2NOB = 16;
+            extend2Signed = 0;
+
+            rfWData = extend2Out;
+        end else if (iLb) begin
+            rfRAddr1 = base;
+            rfWAddr = rt;
+            rfWe = 1'b1;
+
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = extend1Out;
+            uaddB = rfRData1;
+
+            dmemAAddr = uaddR;
+            dmemAEn = 1'b1;
+
+            byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
+
+            extend2In = dmemAOut[8 * byte +: 8];
+            extend2NOB = 8;
+            extend2Signed = 1'b1;
+
+            rfWData = extend2Out;
+        end else if (iLhu) begin
+            rfRAddr1 = base;
+            rfWAddr = rt;
+            rfWe = 1'b1;
+
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = extend1Out;
+            uaddB = rfRData1;
+
+            dmemAAddr = uaddR;
+            dmemAEn = 1'b1;
+
+            //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+            byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+
+            extend2In = dmemAOut[8 * byte +: 16];
+            extend2NOB = 16;
+            extend2Signed = 1'b1;
+
+            rfWData = extend2Out;
+        end else if (iSb) begin
+            rfRAddr1 = base;
+            rfRAddr2 = rt;
+
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = extend1Out;
+            uaddB = rfRData1;
+
+            dmemAAddr = uaddR;
+
+            byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}} };
+
+            dmemAWe[0] = (byte[1:0] == 2'h0);
+            dmemAWe[1] = (byte[1:0] == 2'h1);
+            dmemAWe[2] = (byte[1:0] == 2'h2);
+            dmemAWe[3] = (byte[1:0] == 2'h3);
+
+            aluA = rfRData2;
+            aluB = byte[1:0] * 8;
+            aluModeSel = ALU_SL;
+            
+            dmemAIn = aluR;
+        end else if (iSh) begin
+            rfRAddr1 = base;
+            rfRAddr2 = rt;
+
+            extend1In = imm;
+            extend1NOB = 16;
+            extend1Signed = 1'b1;
+            
+            uaddA = extend1Out;
+            uaddB = rfRData1;
+
+            dmemAAddr = uaddR;
+
+            //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+            byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+
+            dmemAWe[0] = (byte[1] == 2'h0);
+            dmemAWe[1] = (byte[1] == 2'h0);
+            dmemAWe[2] = (byte[1] == 2'h1);
+            dmemAWe[3] = (byte[1] == 2'h1);
+
+            aluA = rfRData2;
+            aluB = byte[1] ? 16 : 0;
+            aluModeSel = ALU_SL;
+            
+            dmemAIn = aluR;
+        end else if (iBreak) begin
+            exec_addr = pcNextInst;
+            byte = 0;   // Do nothing
+        end else if (iSyscall) begin
+            exec_addr = pcNextInst;
+        end else if (iEret) begin
+            byte = 0;  // Do nothing
+        end else if (iMfhi) begin
+            rfWAddr = rd;
+            rfWe = 1'b1;
+            rfWData = hi;
+        end else if (iMflo) begin
+            rfWAddr = rd;
+            rfWe = 1'b1;
+            rfWData = lo;
+        end else if (iMthi) begin
+            rfRAddr1 = rs;
+            nextHi = rfRData1;
+        end else if (iMtlo) begin
+            rfRAddr1 = rs;
+            nextLo = rfRData1;
+        end else if (iMfc0) begin
+            byte = 0;
+        end else if (iMtc0) begin
+            byte = 0;
+        end else if (iClz) begin
+            rfRAddr1 = rs;
+            aluA = rfRData1;
+            aluB = 0;
+            aluModeSel = ALU_CLZ;
+
+            rfWe = 1;
+            rfWAddr = rt;
+            rfWData = aluR;
+        end else if (iTeq) begin
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
+
+            aluA = rfRData1;
+            aluB = rfRData2;
+            aluModeSel = ALU_EQU;
+
+            if(aluR[0])
+                exec_addr = pcNextInst;
+
+            trap = aluR[0];
+        end
+    end
+
 endmodule

@@ -23,34 +23,21 @@ module sccomp_dataflow(
     wire [31:0] dmemAOut;
     wire [31:0] dmemAOut_Selected;
 
-    wire dmemBEn;
-    wire [3:0] dmemBWe;
-    wire [31:0] dmemBAddr;
-    wire [31:0] dmemBIn;
-    wire [31:0] dmemBOut;
-
     /////////
     /// DMEM Address Mapper
-    wire dmemARealAddr = dmemAAddr - 32'h10010000;
-    wire dmemBRealAddr = dmemBAddr - 32'h10010000;
+    wire [31:0] dmemARealAddr = dmemAAddr - 32'h10010000;
 
     // DMEM Port A has priority
     // Oh, I don't think we will need DMEM port B anymore...
-    assign addr = dmemAEn ? dmemAAddr : dmemBEn ? dmemBAddr : 32'hFFFFFFFF;
+    assign addr = dmemAEn ? dmemAAddr : 32'hFFFFFFFF;
 
     DMEM dmem (
-        .clka(clk),    // input wire clka
+        .clka(~clk),    // input wire clka
         .ena(dmemAEn),      // input wire ena
         .wea(dmemAWe),      // input wire [3 : 0] wea
-        .addra(dmemARealAddr[9:0]),  // input wire [9 : 0] addra
+        .addra(dmemARealAddr[11:2]),  // input wire [9 : 0] addra
         .dina(dmemAIn),    // input wire [31 : 0] dina
-        .douta(dmemAOut),  // output wire [31 : 0] douta
-        .clkb(~clk),    // input wire clkb
-        .enb(dmemBEn),      // input wire enb
-        .web(dmemBWe),      // input wire [3 : 0] web
-        .addrb(dmemBRealAddr[9:0]),  // input wire [9 : 0] addrb
-        .dinb(dmemBIn),    // input wire [31 : 0] dinb
-        .doutb(dmemBOut)  // output wire [31 : 0] doutb
+        .douta(dmemAOut)   // output wire [31 : 0] douta
     );
 
     //////////////
@@ -65,7 +52,7 @@ module sccomp_dataflow(
     io_sel ioselector_signalgen(
         .addr(dmemAAddr),
         .cs(ioSelector_Ena),
-        .sig_w(dmemAWe),
+        .sig_w(dmemAWe[3] & dmemAWe[2] & dmemAWe[1] & dmemAWe[0]),
         .sig_r(dmemAEn),
         .seg7_cs(seg7_cs),
         .switch_cs(switch_cs)
@@ -99,7 +86,7 @@ module sccomp_dataflow(
     ///
     wire imemWe = 0;
     wire [31:0] imemAddr;
-    wire [31:0] imemIn;
+    wire [31:0] imemIn = 0;
     wire [31:0] imemOut;
 
     assign pc = imemAddr;
@@ -107,11 +94,11 @@ module sccomp_dataflow(
 
     ///////////////
     /// IMEM Address Mapper
-    wire imemRealAddr = imemAddr - 32'h00400000;
-    IMEM imem (
+    wire [31:0] imemRealAddr = imemAddr - 32'h00400000;
+    IMEM_sim_ro imem (
         .clka(clk),    // input wire clka
         .wea(imemWe),      // input wire [0 : 0] wea
-        .addra(imemRealAddr[9:0]),  // input wire [9 : 0] addra
+        .addra(imemRealAddr[11:2]),  // input wire [9 : 0] addra
         .dina(imemIn),    // input wire [31 : 0] dina
         .douta(imemOut)  // output wire [31 : 0] douta
     );
@@ -122,20 +109,12 @@ module sccomp_dataflow(
     azathoth sccpu(
         .clk(clk),
         .reset(reset),
-
         .dmemAEn(dmemAEn),
         .dmemAWe(dmemAWe),
         .dmemAAddr(dmemAAddr),
         .dmemAIn(dmemAIn),
         .dmemAOut(dmemAOut_Selected),
-
-        .dmemBEn(dmemBEn),
-        .dmemBWe(dmemBWe),
-        .dmemBAddr(dmemBAddr),
-        .dmemBIn(dmemBIn),
-        .dmemBOut(dmemBOut)
-
         .pc(imemAddr),
-        .inst(imemOut),
+        .inst(imemOut)
     );
 endmodule

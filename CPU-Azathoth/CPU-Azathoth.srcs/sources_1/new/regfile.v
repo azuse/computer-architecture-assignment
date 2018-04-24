@@ -47,7 +47,7 @@ module regfile #(
         if(rst) begin
             for(j = 0; j < num; j = j + 1)
             begin : reset_regs
-                array_reg[i] <= {(width){1'b0}};
+                array_reg[j] <= {(width){1'b0}};
             end
         end else if(we) begin
             if(waddr == 0)  // zero register $zero

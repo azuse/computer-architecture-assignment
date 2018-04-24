@@ -1,0 +1,121 @@
+Parsing file: 28_sub.hex.txt 
+
+sll $0, 0
+addi $0, $0, 0
+addi $at, $0, 1
+addi $v0, $0, 65535
+lui $v1, -32768
+addi $a0, $0, 0
+addi $a1, $0, 1
+addi $a2, $0, 2
+addi $a3, $0, 3
+addi $t0, $0, 4
+addi $t1, $0, 5
+addi $t2, $0, 6
+addi $t3, $0, 7
+addi $t4, $0, 8
+addi $t5, $0, 9
+addi $t16, $0, 10
+addi $t17, $0, 11
+addi $s0, $0, 12
+addi $s1, $0, 13
+addi $s2, $0, 14
+lui $s3, -4096
+addi $s4, $0, 32768
+lui $s5, -32768
+addi $s6, $0, 65535
+addi $s7, $0, 65520
+lui $t8, -28673
+lui $t9, -24577
+lui $k0, -4097
+lui $k1, -28880
+lui $gp, -32740
+lui $sp, -32739
+lui $fp, -32738
+lui $ra, -32737
+sub $0, $0, $0
+sub $0, $0, $at
+sub $0, $0, $v0
+sub $a0, $a0, $0
+sub $a0, $a0, $at
+sub $a0, $a0, $v0
+sub $a1, $a1, $0
+sub $a1, $a1, $at
+sub $a1, $a1, $v0
+sub $a2, $a2, $0
+sub $a2, $a2, $at
+sub $a2, $a2, $v0
+sub $a3, $t0, $0
+sub $a3, $t0, $at
+sub $a3, $t0, $v0
+sub $t0, $t0, $0
+sub $t0, $t0, $at
+sub $t0, $t0, $v0
+sub $t1, $t1, $0
+sub $t1, $t1, $at
+sub $t1, $t1, $v0
+sub $t2, $t2, $0
+sub $t2, $t2, $at
+sub $t2, $t2, $v0
+sub $t3, $t3, $0
+sub $t3, $t3, $at
+sub $t3, $t3, $v0
+sub $t4, $t4, $0
+sub $t4, $t4, $at
+sub $t4, $t4, $v0
+sub $t5, $t5, $0
+sub $t5, $t5, $at
+sub $t5, $t5, $v0
+sub $t16, $t16, $0
+sub $t16, $t16, $at
+sub $t16, $t16, $v0
+sub $t17, $t17, $0
+sub $t17, $t17, $at
+sub $t17, $t17, $v0
+sub $s0, $s0, $0
+sub $s0, $s0, $at
+sub $s0, $s0, $v0
+sub $s1, $s1, $0
+sub $s1, $s1, $at
+sub $s1, $s1, $v0
+sub $s2, $s2, $0
+sub $s2, $s2, $at
+sub $s2, $s2, $v0
+sub $s3, $s3, $0
+sub $s3, $s3, $at
+sub $s3, $s3, $v0
+sub $s4, $s4, $0
+sub $s4, $s4, $at
+sub $s4, $s4, $v0
+sub $s5, $s5, $0
+sub $s5, $s5, $v0
+sub $s6, $s6, $0
+sub $s6, $s6, $at
+sub $s6, $s6, $v0
+sub $s7, $s7, $0
+sub $s7, $s7, $at
+sub $s7, $s7, $v0
+sub $t8, $t8, $0
+sub $t8, $t8, $at
+sub $t8, $t8, $v0
+sub $t9, $t9, $0
+sub $t9, $t9, $at
+sub $t9, $t9, $v0
+sub $k0, $k0, $0
+sub $k0, $k0, $at
+sub $k0, $k0, $v0
+sub $k1, $k1, $0
+sub $k1, $k1, $at
+sub $k1, $k1, $v0
+sub $gp, $gp, $0
+sub $gp, $gp, $at
+sub $gp, $gp, $v0
+sub $sp, $sp, $0
+sub $sp, $sp, $at
+sub $sp, $sp, $v0
+sub $fp, $fp, $0
+sub $fp, $fp, $at
+sub $fp, $fp, $v0
+sub $ra, $ra, $0
+sub $ra, $ra, $at
+sub $ra, $ra, $v0

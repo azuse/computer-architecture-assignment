@@ -1,0 +1,4 @@
+Parsing file: 11_beq.hex.txt 
+
+sll $0, 0
+beq $0, $0, 1

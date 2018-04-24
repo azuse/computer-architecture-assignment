@@ -1,0 +1,24 @@
+Parsing file: 15_jr.hex.txt 
+
+sll $0, 0
+addi $at, $0, 0
+addi $v0, $0, 0
+addi $v1, $0, 0
+addi $a0, $0, 0
+addi $a1, $0, 0
+addi $a2, $0, 0
+addi $a3, $0, 0
+addi $t0, $0, 0
+lui $at, 64
+ori $at, $at, 60
+jr $at
+addi $v0, $0, 65535
+addi $v1, $0, 65535
+addi $a0, $0, 65535
+addi $a1, $0, 65535
+addi $a2, $a2, 1
+addi $a3, $0, 3
+addi $t0, $t0, 3
+addi $at, $0, 64
+beq $a3, $t0, 2
+jr $at

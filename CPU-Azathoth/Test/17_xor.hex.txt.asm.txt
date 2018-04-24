@@ -1,0 +1,37 @@
+Parsing file: 17_xor.hex.txt 
+
+sll $0, 0
+addi $0, $0, 0
+addi $at, $0, 1
+addi $v0, $0, 65535
+lui $v1, -32768
+lui $a0, 21845
+addi $a0, $at, 21845
+lui $a1, -21846
+addi $a1, $at, 43690
+addi $a2, $0, 0
+addi $a3, $0, 4369
+addi $t0, $0, 8738
+addi $t1, $0, 13107
+addi $t2, $0, 17476
+addi $t3, $0, 21845
+addi $t4, $0, 26214
+addi $t5, $0, 30583
+addi $t16, $0, 34952
+addi $t17, $0, 39321
+addi $s0, $0, 43690
+addi $s1, $0, 48059
+addi $s2, $0, 52428
+lui $s3, -8739
+addi $s4, $0, 61166
+lui $s5, -1
+addi $s6, $0, 56797
+addi $s7, $0, 65535
+lui $t8, -21006
+lui $t9, 4659
+lui $k0, 17237
+lui $k1, 25428
+lui $gp, -31406
+lui $sp, 8481
+lui $fp, -26223
+lui $ra, 29797

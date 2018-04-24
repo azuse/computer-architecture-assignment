@@ -1,0 +1,100 @@
+Parsing file: 16.26_lwsw2.hex.txt 
+
+sll $0, 0
+addi $at, $0, 65535
+addi $v0, $0, 15
+addi $v1, $0, 255
+addi $a0, $0, 4095
+addi $a1, $0, 65535
+addi $a2, $0, 21845
+addi $a3, $0, 43690
+addi $t0, $0, 48059
+addi $t1, $0, 52428
+addi $t2, $0, 56797
+addi $t3, $0, 61166
+addi $t4, $0, 65535
+lui $t5, -1
+lui $t16, 15
+lui $t17, 255
+lui $s0, 4095
+lui $s1, -1
+lui $s2, 21845
+lui $s3, -21846
+lui $s4, -17477
+lui $s5, -13108
+lui $s6, -8739
+lui $s7, -4370
+lui $t8, -1
+lui $t9, -1
+lui $k0, 15
+lui $k1, 255
+lui $gp, 4095
+lui $sp, -1
+lui $fp, 21845
+lui $ra, 4097
+sw $0, $ra, 0
+sw $at, $ra, 4
+sw $v0, $ra, 8
+sw $v1, $ra, 12
+sw $a0, $ra, 16
+sw $a1, $ra, 20
+sw $a2, $ra, 24
+sw $a3, $ra, 28
+sw $t0, $ra, 32
+sw $t1, $ra, 36
+sw $t2, $ra, 40
+sw $t3, $ra, 44
+sw $t4, $ra, 48
+sw $t5, $ra, 52
+sw $t16, $ra, 56
+sw $t17, $ra, 60
+sw $s0, $ra, 64
+sw $s1, $ra, 68
+sw $s2, $ra, 72
+sw $s3, $ra, 76
+sw $s4, $ra, 80
+sw $s5, $ra, 84
+sw $s6, $ra, 88
+sw $s7, $ra, 92
+sw $t8, $ra, 96
+sw $t9, $ra, 100
+sw $k0, $ra, 104
+sw $k1, $ra, 108
+sw $gp, $ra, 112
+sw $sp, $ra, 116
+sw $fp, $ra, 120
+lw $0, $ra, 4
+lw $at, $ra, 8
+lw $v0, $ra, 12
+lw $v1, $ra, 16
+lw $a0, $ra, 20
+lw $a1, $ra, 24
+lw $a2, $ra, 28
+lw $a3, $ra, 32
+lw $t0, $ra, 36
+lw $t1, $ra, 40
+lw $t2, $ra, 44
+lw $t3, $ra, 48
+lw $t4, $ra, 52
+lw $t5, $ra, 56
+lw $t16, $ra, 60
+lw $t17, $ra, 64
+lw $s0, $ra, 68
+lw $s1, $ra, 72
+lw $s2, $ra, 76
+lw $s3, $ra, 80
+lw $s4, $ra, 84
+lw $s5, $ra, 88
+lw $s6, $ra, 92
+lw $s7, $ra, 96
+lw $t8, $ra, 100
+lw $t9, $ra, 104
+lw $k0, $ra, 108
+lw $k1, $ra, 112
+lw $gp, $ra, 116
+lw $sp, $ra, 120
+lw $fp, $ra, 0
+addi $ra, $0, 15
+lui $at, 4097
+sw $ra, $at, 124
+lw $at, $at, 124
