@@ -99,10 +99,10 @@ module sccomp_dataflow(
     ///////////////
     /// IMEM Address Mapper
     wire [31:0] imemRealAddr = imemAddr - 32'h00400000;
-    IMEM_sim_ro imem (
+    IMEM imem (
         .clka(clk),    // input wire clka
         .wea(imemWe),      // input wire [0 : 0] wea
-        .addra(imemRealAddr[11:2]),  // input wire [9 : 0] addra
+        .addra(imemRealAddr[14:2]),  // input wire [12 : 0] addra
         .dina(imemIn),    // input wire [31 : 0] dina
         .douta(imemOut)  // output wire [31 : 0] douta
     );
@@ -113,7 +113,7 @@ module sccomp_dataflow(
     azathoth sccpu(
         .clk(clk),
         .reset(reset),
-        .ena(~cpuEna_n),
+        .ena(1'b1),
         .dmemAEn(dmemAEn),
         .dmemAWe(dmemAWe),
         .dmemAAddr(dmemAAddr),

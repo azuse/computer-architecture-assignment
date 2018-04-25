@@ -120,7 +120,7 @@ module azathoth(
     wire [15:0] imm = inst[15:0];
     wire [25:0] index = inst[25:0];
 
-    reg iAdd, iAddu, iSub, iSubu, iAnd, iOr, iXor, iNor, iSlt, iSltu, iSll, iSrl, iSra, iSllv, iSrlv, iSrav, iJr, iAddi, iAddiu, iAndi, iOri, iXori, iLw, iSw, iBeq, iBne, iSlti, iSltiu, iLui, iJ, iJal, iDiv, iDivu, iMult, iMultu, iBgez, iJalr, iLbu, iLhu, iLb, iLh, iSb, iSh, iBreak, iSyscall, iEret, iMfhi, iMflo, iMthi, iMtlo, iMfc0, iMtc0, iClz, iTeq;
+    reg iMul, iAdd, iAddu, iSub, iSubu, iAnd, iOr, iXor, iNor, iSlt, iSltu, iSll, iSrl, iSra, iSllv, iSrlv, iSrav, iJr, iAddi, iAddiu, iAndi, iOri, iXori, iLw, iSw, iBeq, iBne, iSlti, iSltiu, iLui, iJ, iJal, iDiv, iDivu, iMult, iMultu, iBgez, iJalr, iLbu, iLhu, iLb, iLh, iSb, iSh, iBreak, iSyscall, iEret, iMfhi, iMflo, iMthi, iMtlo, iMfc0, iMtc0, iClz, iTeq;
 
     always @ (*)
     begin
@@ -164,6 +164,7 @@ module azathoth(
         
         if(op == 6'b000000 && func == 6'b011010 && shamt == 5'h0 && rd == 5'h0) iDiv = 1; else iDiv = 0;
         if(op == 6'b000000 && func == 6'b011011 && shamt == 5'h0 && rd == 5'h0) iDivu = 1; else iDivu = 0;
+        if(op == 6'b011100 && func == 6'b000010 && shamt == 5'h0) iMul = 1; else iMul = 0;
         if(op == 6'b000000 && func == 6'b011000 && shamt == 5'h0 && rd == 5'h0) iMult = 1; else iMult = 0;
         if(op == 6'b000000 && func == 6'b011001 && shamt == 5'h0 && rd == 5'h0) iMultu = 1; else iMultu = 0;
 
@@ -219,7 +220,7 @@ module azathoth(
     /////////////////////////
     /// Main Blocks
 
-    reg cpuStarted = 0;
+    reg cpuStarted = 1;
     assign cpuRunning = cpuStarted & ena;
     reg [5:0] startCounter = 0;
     localparam startNo = 10;
@@ -254,7 +255,7 @@ module azathoth(
             pc <= initInstAddr;
             hi <= 0;
             lo <= 0;
-            cpuStarted <= 0;
+            cpuStarted <= 1;
         end
         else
         begin
@@ -313,7 +314,7 @@ module azathoth(
     end
 
     // Instruction-specific datapath
-    reg [4:0] byte;
+    reg [4:0] bytePos;
     reg [31:0] exec_addr;
     reg trap;
     localparam BigEndianCPU = 1'b0;
@@ -335,7 +336,7 @@ module azathoth(
         rfRAddr1 = 0;
         rfRAddr2 = 0;
 
-        byte = 5'bxxxxx;
+        bytePos = 5'bxxxxx;
 
         aluA = 0;
         aluB = 0;
@@ -692,6 +693,17 @@ module azathoth(
                 
                 nextHi = aluRX;
                 nextLo = aluR;
+            end else if (iMul) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SMUL;
+                
+                rfWData = aluR;
+                rfWAddr = rd;
+                rfWe = 1;
+                
             end else if (iMultu) begin
                 rfRAddr1 = rs;
                 rfRAddr2 = rt;
@@ -708,7 +720,7 @@ module azathoth(
                 extend1Signed = 1'b1;
                 
                 uaddA = pcNextInst;
-                uaddB = extend1Out;
+                uaddB = extend1Out << 2;
             end else if (iJalr) begin
                 rfRAddr1 = rs;
                 rfWe = 1'b1;
@@ -729,9 +741,9 @@ module azathoth(
                 dmemAAddr = uaddR;
                 dmemAEn = 1'b1;
 
-                byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
+                bytePos = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
 
-                extend2In = dmemAOut[8 * byte +: 8];
+                extend2In = dmemAOut[8 * bytePos +: 8];
                 extend2NOB = 8;
                 extend2Signed = 0;
 
@@ -751,10 +763,10 @@ module azathoth(
                 dmemAAddr = uaddR;
                 dmemAEn = 1'b1;
 
-                //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
-                byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+                //bytePos = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+                bytePos = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
 
-                extend2In = dmemAOut[8 * byte +: 16];
+                extend2In = dmemAOut[8 * bytePos +: 16];
                 extend2NOB = 16;
                 extend2Signed = 0;
 
@@ -774,14 +786,14 @@ module azathoth(
                 dmemAAddr = uaddR;
                 dmemAEn = 1'b1;
 
-                byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
+                bytePos = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
 
-                extend2In = dmemAOut[8 * byte +: 8];
+                extend2In = dmemAOut[8 * bytePos +: 8];
                 extend2NOB = 8;
                 extend2Signed = 1'b1;
 
                 rfWData = extend2Out;
-            end else if (iLhu) begin
+            end else if (iLh) begin
                 rfRAddr1 = base;
                 rfWAddr = rt;
                 rfWe = 1'b1;
@@ -796,10 +808,10 @@ module azathoth(
                 dmemAAddr = uaddR;
                 dmemAEn = 1'b1;
 
-                //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
-                byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+                //bytePos = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+                bytePos = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
 
-                extend2In = dmemAOut[8 * byte +: 16];
+                extend2In = dmemAOut[8 * bytePos +: 16];
                 extend2NOB = 16;
                 extend2Signed = 1'b1;
 
@@ -818,15 +830,15 @@ module azathoth(
                 dmemAEn = 1'b1;
                 dmemAAddr = uaddR;
 
-                byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}} };
+                bytePos = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}} };
 
-                dmemAWe[0] = (byte[1:0] == 2'h0);
-                dmemAWe[1] = (byte[1:0] == 2'h1);
-                dmemAWe[2] = (byte[1:0] == 2'h2);
-                dmemAWe[3] = (byte[1:0] == 2'h3);
+                dmemAWe[0] = (bytePos[1:0] == 2'h0);
+                dmemAWe[1] = (bytePos[1:0] == 2'h1);
+                dmemAWe[2] = (bytePos[1:0] == 2'h2);
+                dmemAWe[3] = (bytePos[1:0] == 2'h3);
 
                 aluA = rfRData2;
-                aluB = byte[1:0] * 8;
+                aluB = bytePos[1:0] * 8;
                 aluModeSel = ALU_SL;
                 
                 dmemAIn = aluR;
@@ -843,27 +855,27 @@ module azathoth(
 
                 dmemAAddr = uaddR;
 
-                //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
-                byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+                //bytePos = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+                bytePos = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
 
                 dmemAEn = 1'b1;
-                dmemAWe[0] = (byte[1] == 2'h0);
-                dmemAWe[1] = (byte[1] == 2'h0);
-                dmemAWe[2] = (byte[1] == 2'h1);
-                dmemAWe[3] = (byte[1] == 2'h1);
+                dmemAWe[0] = (bytePos[1] == 2'h0);
+                dmemAWe[1] = (bytePos[1] == 2'h0);
+                dmemAWe[2] = (bytePos[1] == 2'h1);
+                dmemAWe[3] = (bytePos[1] == 2'h1);
 
                 aluA = rfRData2;
-                aluB = byte[1] ? 16 : 0;
+                aluB = bytePos[1] ? 16 : 0;
                 aluModeSel = ALU_SL;
                 
                 dmemAIn = aluR;
             end else if (iBreak) begin
                 exec_addr = pcNextInst;
-                byte = 0;   // Do nothing
+                bytePos = 0;   // Do nothing
             end else if (iSyscall) begin
                 exec_addr = pcNextInst;
             end else if (iEret) begin
-                byte = 0;  // Do nothing
+                bytePos = 0;  // Do nothing
             end else if (iMfhi) begin
                 rfWAddr = rd;
                 rfWe = 1'b1;
@@ -879,9 +891,9 @@ module azathoth(
                 rfRAddr1 = rs;
                 nextLo = rfRData1;
             end else if (iMfc0) begin
-                byte = 0;
+                bytePos = 0;
             end else if (iMtc0) begin
-                byte = 0;
+                bytePos = 0;
             end else if (iClz) begin
                 rfRAddr1 = rs;
                 aluA = rfRData1;
@@ -889,7 +901,7 @@ module azathoth(
                 aluModeSel = ALU_CLZ;
 
                 rfWe = 1;
-                rfWAddr = rt;
+                rfWAddr = rd;
                 rfWData = aluR;
             end else if (iTeq) begin
                 rfRAddr1 = rs;

@@ -10,11 +10,8 @@
 -makelib ies/xpm \
   "D:/SoftPath/Xilinx/Vivado/2016.2/data/ip/xpm/xpm_VCOMP.vhd" \
 -endlib
--makelib ies/blk_mem_gen_v8_3_3 \
-  "../../../ipstatic/blk_mem_gen_v8_3_3/simulation/blk_mem_gen_v8_3.v" \
--endlib
 -makelib ies/xil_defaultlib \
-  "../../../../CPU-Azathoth.srcs/sources_1/ip/IMEM/sim/IMEM.v" \
+  "../../../../CPU-Azathoth.srcs/sources_1/ip/IMEM/IMEM_sim_netlist.v" \
 -endlib
 -makelib ies/xil_defaultlib \
   glbl.v

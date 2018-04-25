@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="14" Path="C:/Users/riv/Documents/Projects/comp-arch/CPU-Azathoth/CPU-Azathoth.xpr">
+<Project Version="7" Minor="14" Path="D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="0aafb0004eda49b4a5d56de844040277"/>
@@ -28,19 +28,19 @@
     <Option Name="IPStaticSourceDir" Val="$PPRDIR/CPU-Azathoth.ip_user_files/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="WTXSimLaunchSim" Val="11"/>
-    <Option Name="WTModelSimLaunchSim" Val="117"/>
+    <Option Name="WTModelSimLaunchSim" Val="140"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="4"/>
-    <Option Name="WTModelSimExportSim" Val="4"/>
-    <Option Name="WTQuestaExportSim" Val="4"/>
-    <Option Name="WTIesExportSim" Val="4"/>
-    <Option Name="WTVcsExportSim" Val="4"/>
-    <Option Name="WTRivieraExportSim" Val="4"/>
-    <Option Name="WTActivehdlExportSim" Val="4"/>
+    <Option Name="WTXSimExportSim" Val="9"/>
+    <Option Name="WTModelSimExportSim" Val="9"/>
+    <Option Name="WTQuestaExportSim" Val="9"/>
+    <Option Name="WTIesExportSim" Val="9"/>
+    <Option Name="WTVcsExportSim" Val="9"/>
+    <Option Name="WTRivieraExportSim" Val="9"/>
+    <Option Name="WTActivehdlExportSim" Val="9"/>
   </Configuration>
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
@@ -114,13 +114,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/IMEM_sim_ro.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PSRCDIR/sources_1/new/sw_mem_sel.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -153,6 +146,32 @@
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/new/IMEM_sim_ro.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/mips_54_mars_switch_student.coe">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/cpu31-switch-student.coe">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/1652270-Test/mips_31_mars_simulate.coe">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
@@ -235,7 +254,6 @@
     <FileSet Name="IMEM" Type="BlockSrcs" RelSrcDir="$PSRCDIR/IMEM">
       <File Path="$PSRCDIR/sources_1/ip/IMEM/IMEM.xci">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -284,11 +302,14 @@
         <Step Id="synth_design"/>
       </Strategy>
     </Run>
-    <Run Id="IMEM_synth_1" Type="Ft3:Synth" SrcSet="IMEM" Part="xc7a100tcsg324-1" ConstrsSet="IMEM" Description="Vivado Synthesis Defaults" IncludeInArchive="true">
+    <Run Id="IMEM_synth_1" Type="Ft3:Synth" SrcSet="IMEM" Part="xc7a100tcsg324-1" ConstrsSet="IMEM" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/IMEM_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016">
+          <Desc>Vivado Synthesis Defaults</Desc>
+        </StratHandle>
         <Step Id="synth_design"/>
       </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a100tcsg324-1" ConstrsSet="constrs_1" Description="Default settings for Implementation." State="current" SynthRun="synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
@@ -320,7 +341,9 @@
     </Run>
     <Run Id="IMEM_impl_1" Type="Ft2:EntireDesign" Part="xc7a100tcsg324-1" ConstrsSet="IMEM" Description="Default settings for Implementation." SynthRun="IMEM_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016"/>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2016">
+          <Desc>Default settings for Implementation.</Desc>
+        </StratHandle>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

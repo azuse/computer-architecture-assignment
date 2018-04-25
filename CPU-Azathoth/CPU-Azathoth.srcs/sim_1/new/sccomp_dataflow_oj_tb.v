@@ -52,8 +52,8 @@ module sccomp_dataflow_oj_tb(
         clk_in = 0;
         rst = 1;
         file_output = $fopen("results.txt");
-        #20
-        $readmemh("../../../Test/28_sub.hex.txt", uut.imem.array_reg);
+        #100
+        //$readmemh("../../../Test/54_div.hex.txt", uut.imem.array_reg);
         #23
         rst = 0;
     end
