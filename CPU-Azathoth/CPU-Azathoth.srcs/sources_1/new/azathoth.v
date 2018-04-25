@@ -205,7 +205,7 @@ module azathoth(
 
     ///////////////////////
     /// Next PC
-    wire [31:0] pcNextInst = pc + 4;
+    reg [31:0] pcNextInst;
     reg [31:0] nextPC;
 
     ///////////////////////
@@ -240,6 +240,9 @@ module azathoth(
                 else if (startCounter >= startNo - 1) begin
                     startCounter <= startNo - 1;
                 end
+            end else begin
+                // because pcNextInst is in combinational logic, and we need to maintain pcNextInst after pc changes(for Jal etc), we must only update pcNextInst at posedge
+                pcNextInst <= pc + 4;
             end
         end
     end
@@ -607,7 +610,7 @@ module azathoth(
                 aluB = extend1Out;
                 aluModeSel = ALU_UADD;
 
-                dmemAEn = 1'b0;
+                dmemAEn = 1'b1;
                 dmemAWe = 4'hf;
                 dmemAAddr = aluR;
                 dmemAIn = rfRData2;
@@ -652,16 +655,10 @@ module azathoth(
             end else if (iLui) begin
                 rfRAddr1 = 0;
                 rfRAddr2 = 0;
-                extend1In = imm;
-                extend1NOB = 16;
-                extend1Signed = 1'b0;
-                aluA = 0;
-                aluB = 0;
-                aluModeSel = ALU_AND;
 
                 rfWe = 1'b1;
                 rfWAddr = rt;
-                rfWData = extend1Out;
+                rfWData = {imm, 16'h0};
             end else if (iJ) begin
                 rfRAddr1 = 0;   // Do nothing
             end else if (iJal) begin
@@ -818,6 +815,7 @@ module azathoth(
                 uaddA = extend1Out;
                 uaddB = rfRData1;
 
+                dmemAEn = 1'b1;
                 dmemAAddr = uaddR;
 
                 byte = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}} };
@@ -848,6 +846,7 @@ module azathoth(
                 //byte = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
                 byte = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
 
+                dmemAEn = 1'b1;
                 dmemAWe[0] = (byte[1] == 2'h0);
                 dmemAWe[1] = (byte[1] == 2'h0);
                 dmemAWe[2] = (byte[1] == 2'h1);

@@ -27,8 +27,8 @@
     <Option Name="IPUserFilesDir" Val="$PPRDIR/CPU-Azathoth.ip_user_files"/>
     <Option Name="IPStaticSourceDir" Val="$PPRDIR/CPU-Azathoth.ip_user_files/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
-    <Option Name="WTXSimLaunchSim" Val="9"/>
-    <Option Name="WTModelSimLaunchSim" Val="87"/>
+    <Option Name="WTXSimLaunchSim" Val="11"/>
+    <Option Name="WTModelSimLaunchSim" Val="117"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>

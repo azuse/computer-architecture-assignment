@@ -53,7 +53,7 @@ module sccomp_dataflow_oj_tb(
         rst = 1;
         file_output = $fopen("results.txt");
         #20
-        $readmemh("../../../Test/5_slti.hex.txt", uut.imem.array_reg);
+        $readmemh("../../../Test/28_sub.hex.txt", uut.imem.array_reg);
         #23
         rst = 0;
     end
