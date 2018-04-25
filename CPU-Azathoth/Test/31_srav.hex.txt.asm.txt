@@ -1,0 +1,11 @@
+Parsing file: 31_srav.hex.txt 
+
+sll $0, 0
+addi $at, $0, 15
+addi $v0, $0, 23295
+addi $v1, $0, 61440
+lui $a0, -4096
+addi $a1, $0, 65535
+addi $ra, $0, 1
+addi $ra, $0, 31
+addi $ra, $0, 1

@@ -1,0 +1,35 @@
+Parsing file: 24_srl.hex.txt 
+
+sll $0, 0
+addi $at, $0, 15
+addi $v0, $0, 23295
+addi $v1, $0, 61440
+addi $a0, $0, 61440
+addi $a1, $0, 65370
+addi $ra, $0, 65535
+srl $a2, 1
+srl $a3, 31
+srl $t0, 1
+srl $t1, 31
+srl $t2, 1
+srl $t3, 31
+srl $t4, 1
+srl $t5, 31
+srl $t16, 1
+srl $t17, 31
+srl $s0, 5
+srl $s1, 16
+srl $s2, 2
+srl $s3, 29
+srl $s4, 7
+srl $s5, 9
+srl $s6, 3
+srl $s7, 6
+srl $t8, 26
+srl $t9, 30
+srl $k0, 1
+srl $k1, 31
+srl $gp, 0
+srl $sp, 1
+srl $fp, 31
+srl $ra, 0

@@ -1,0 +1,68 @@
+Parsing file: 22_sltu.hex.txt 
+
+sll $0, 0
+addi $0, $0, 0
+addi $at, $0, 1
+addi $v0, $0, 65535
+lui $v1, -32768
+lui $a0, 21845
+addi $a0, $at, 21845
+lui $a1, -21846
+addi $a1, $at, 43690
+addi $a2, $0, 0
+addi $a3, $0, 4369
+addi $t0, $0, 4369
+addi $t1, $0, 4369
+addi $t2, $0, 4369
+addi $t3, $0, 4369
+addi $t4, $0, 32768
+addi $t5, $0, 32768
+addi $t16, $0, 32768
+addi $t17, $0, 32768
+addi $s0, $0, 32768
+addi $s1, $0, 65535
+addi $s2, $0, 65535
+addi $s3, $0, 65535
+addi $s4, $0, 65535
+addi $s5, $0, 65535
+lui $s6, -32768
+lui $s7, -32768
+lui $t8, -32768
+lui $t9, -32768
+lui $k0, -32768
+lui $k1, -21846
+lui $gp, -21846
+lui $sp, -21846
+lui $fp, -21846
+lui $ra, -21846
+sltu $0, $0, $at
+sltu $a3, $at, $a3
+sltu $t0, $v0, $t0
+sltu $t1, $v1, $t1
+sltu $t2, $a0, $t2
+sltu $t3, $a1, $t3
+sltu $t4, $at, $t4
+sltu $t5, $v0, $t5
+sltu $t16, $v1, $t16
+sltu $t17, $a0, $t17
+sltu $s0, $a1, $s0
+sltu $s1, $at, $s1
+sltu $s2, $v0, $s2
+sltu $s3, $v1, $s3
+sltu $s4, $a0, $s4
+sltu $s5, $a1, $s5
+sltu $s6, $at, $s6
+sltu $s7, $v0, $s7
+sltu $t8, $v1, $t8
+sltu $t9, $a0, $t9
+sltu $k0, $a1, $k0
+sltu $k1, $at, $k1
+sltu $gp, $v0, $gp
+sltu $sp, $v1, $sp
+sltu $fp, $a0, $fp
+sltu $ra, $a1, $ra
+sltu $at, $a2, $at
+sltu $v0, $a2, $at
+sltu $v1, $a2, $at
+sltu $a0, $a2, $at
+sltu $a1, $a2, $at

@@ -1,0 +1,4 @@
+Parsing file: 52_bgez.hex.txt 
+
+sll $0, 0
+addi $t2, $0, 0

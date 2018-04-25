@@ -1,0 +1,6 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.sim/sim_1/synth/timing/ALU_tb_time_synth.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ALU
+INFO: [VRFC 10-311] analyzing module glbl
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sim_1/new/ALU_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ALU_tb
+WARNING: [VRFC 10-969] keyword 'unsigned' is not allowed here in this mode of verilog [D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sim_1/new/ALU_tb.v:54]

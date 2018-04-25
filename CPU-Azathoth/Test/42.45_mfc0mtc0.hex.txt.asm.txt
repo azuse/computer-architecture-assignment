@@ -1,0 +1,4 @@
+Parsing file: 42.45_mfc0mtc0.hex.txt 
+
+sll $0, 0
+addi $t0, $0, 3

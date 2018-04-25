@@ -1,0 +1,100 @@
+Parsing file: 38_lhu2.hex.txt 
+
+sll $0, 0
+addi $at, $0, 65535
+addi $v0, $0, 15
+addi $v1, $0, 255
+addi $a0, $0, 4095
+addi $a1, $0, 65535
+addi $a2, $0, 21845
+addi $a3, $0, 43690
+addi $t0, $0, 48059
+addi $t1, $0, 52428
+addi $t2, $0, 56797
+addi $t3, $0, 61166
+addi $t4, $0, 65535
+lui $t5, -1
+lui $t16, 15
+lui $t17, 255
+lui $s0, 4095
+lui $s1, -1
+lui $s2, 21845
+lui $s3, -21846
+lui $s4, -17477
+lui $s5, -13108
+lui $s6, -8739
+lui $s7, -4370
+lui $t8, -1
+lui $t9, -1
+lui $k0, 15
+lui $k1, 255
+lui $gp, 4095
+lui $sp, -1
+lui $fp, 21845
+lui $ra, 4097
+sh $0, $ra, 0
+sh $at, $ra, 2
+sh $v0, $ra, 4
+sh $v1, $ra, 6
+sh $a0, $ra, 8
+sh $a1, $ra, 10
+sh $a2, $ra, 12
+sh $a3, $ra, 14
+sh $t0, $ra, 16
+sh $t1, $ra, 18
+sh $t2, $ra, 20
+sh $t3, $ra, 22
+sh $t4, $ra, 24
+sh $t5, $ra, 26
+sh $t16, $ra, 28
+sh $t17, $ra, 30
+sh $s0, $ra, 32
+sh $s1, $ra, 34
+sh $s2, $ra, 36
+sh $s3, $ra, 38
+sh $s4, $ra, 40
+sh $s5, $ra, 42
+sh $s6, $ra, 44
+sh $s7, $ra, 46
+sh $t8, $ra, 48
+sh $t9, $ra, 50
+sh $k0, $ra, 52
+sh $k1, $ra, 54
+sh $gp, $ra, 56
+sh $sp, $ra, 58
+sh $fp, $ra, 60
+lhu $0, $ra, 2
+lhu $at, $ra, 4
+lhu $v0, $ra, 6
+lhu $v1, $ra, 8
+lhu $a0, $ra, 10
+lhu $a1, $ra, 12
+lhu $a2, $ra, 14
+lhu $a3, $ra, 16
+lhu $t0, $ra, 18
+lhu $t1, $ra, 20
+lhu $t2, $ra, 22
+lhu $t3, $ra, 24
+lhu $t4, $ra, 26
+lhu $t5, $ra, 28
+lhu $t16, $ra, 30
+lhu $t17, $ra, 32
+lhu $s0, $ra, 34
+lhu $s1, $ra, 36
+lhu $s2, $ra, 38
+lhu $s3, $ra, 40
+lhu $s4, $ra, 42
+lhu $s5, $ra, 44
+lhu $s6, $ra, 46
+lhu $s7, $ra, 48
+lhu $t8, $ra, 50
+lhu $t9, $ra, 52
+lhu $k0, $ra, 54
+lhu $k1, $ra, 56
+lhu $gp, $ra, 58
+lhu $sp, $ra, 60
+lhu $fp, $ra, 0
+lui $ra, 15
+lui $at, 4097
+sb $ra, $at, 62
+lbu $at, $at, 62

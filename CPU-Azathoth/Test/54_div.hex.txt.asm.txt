@@ -1,0 +1,5 @@
+Parsing file: 54_div.hex.txt 
+
+sll $0, 0
+addi $at, $0, 32767
+addi $v0, $0, 16

@@ -1,0 +1,13 @@
+Parsing file: 12_bne.hex.txt 
+
+sll $0, 0
+bne $0, $0, 23
+addi $at, $at, 0
+bne $0, $at, 21
+addi $v0, $0, 1
+bne $v0, $v0, 19
+addi $v1, $0, 32768
+bne $v1, $v1, 17
+addi $a0, $0, 32768
+addi $a1, $0, 32767
+bne $a1, $a0, 1

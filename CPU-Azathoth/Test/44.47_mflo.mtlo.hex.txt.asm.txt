@@ -1,0 +1,4 @@
+Parsing file: 44.47_mflo.mtlo.hex.txt 
+
+sll $0, 0
+addi $at, $0, 1

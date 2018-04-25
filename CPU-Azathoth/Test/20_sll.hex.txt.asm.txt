@@ -1,0 +1,35 @@
+Parsing file: 20_sll.hex.txt 
+
+sll $0, 0
+addi $at, $0, 15
+addi $v0, $0, 23295
+addi $v1, $0, 61440
+addi $a0, $0, 61440
+addi $a1, $0, 65370
+addi $ra, $0, 65535
+sll $a2, 1
+sll $a3, 31
+sll $t0, 1
+sll $t1, 31
+sll $t2, 1
+sll $t3, 31
+sll $t4, 1
+sll $t5, 31
+sll $t16, 1
+sll $t17, 31
+sll $s0, 5
+sll $s1, 16
+sll $s2, 2
+sll $s3, 19
+sll $s4, 7
+sll $s5, 9
+sll $s6, 3
+sll $s7, 6
+sll $t8, 26
+sll $t9, 30
+sll $k0, 1
+sll $k1, 31
+sll $gp, 0
+sll $sp, 1
+sll $fp, 31
+sll $ra, 0
