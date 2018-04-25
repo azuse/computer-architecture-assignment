@@ -53,7 +53,7 @@ module sccomp_dataflow_oj_tb(
         rst = 1;
         file_output = $fopen("results.txt");
         #20
-        $readmemh("D:/Projects/CompArch/CPU-Azathoth/Test/1_addi.hex.txt", uut.imem.array_reg);
+        $readmemh("../../../Test/5_slti.hex.txt", uut.imem.array_reg);
         #23
         rst = 0;
     end

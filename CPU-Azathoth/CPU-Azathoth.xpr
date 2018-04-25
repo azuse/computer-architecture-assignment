@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="14" Path="D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.xpr">
+<Project Version="7" Minor="14" Path="C:/Users/riv/Documents/Projects/comp-arch/CPU-Azathoth/CPU-Azathoth.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="0aafb0004eda49b4a5d56de844040277"/>
@@ -28,7 +28,7 @@
     <Option Name="IPStaticSourceDir" Val="$PPRDIR/CPU-Azathoth.ip_user_files/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="WTXSimLaunchSim" Val="9"/>
-    <Option Name="WTModelSimLaunchSim" Val="82"/>
+    <Option Name="WTModelSimLaunchSim" Val="87"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
@@ -226,22 +226,6 @@
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="doc/blk_mem_gen_v8_3_changelog.txt"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM.veo"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="synth/DMEM.vhd"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="blk_mem_gen_v8_3_3/hdl/blk_mem_gen_v8_3.vhd"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="blk_mem_gen_v8_3_3/hdl/blk_mem_gen_v8_3_vhsyn_rfs.vhd"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM_ooc.xdc"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="sim/DMEM.v"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="blk_mem_gen_v8_3_3/simulation/blk_mem_gen_v8_3.v"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="misc/blk_mem_gen_v8_3.vhd"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="summary.log"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM.vho"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM.xml"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM_sim_netlist.vhdl"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM_sim_netlist.v"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM_stub.vhdl"/>
-        <CompFileExtendedInfo CompFileName="DMEM.xci" FileRelPathName="DMEM_stub.v"/>
       </File>
       <Config>
         <Option Name="TopModule" Val="DMEM"/>
@@ -288,26 +272,23 @@
     </Simulator>
   </Simulators>
   <Runs Version="1" Minor="10">
-    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a100tcsg324-1" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" State="current" Dir="$PRUNDIR/synth_1" IncludeInArchive="true">
+    <Run Id="synth_1" Type="Ft3:Synth" SrcSet="sources_1" Part="xc7a100tcsg324-1" ConstrsSet="constrs_1" Description="Vivado Synthesis Defaults" State="current" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
-    <Run Id="DMEM_synth_1" Type="Ft3:Synth" SrcSet="DMEM" Part="xc7a100tcsg324-1" ConstrsSet="DMEM" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/DMEM_synth_1" IncludeInArchive="true">
+    <Run Id="DMEM_synth_1" Type="Ft3:Synth" SrcSet="DMEM" Part="xc7a100tcsg324-1" ConstrsSet="DMEM" Description="Vivado Synthesis Defaults" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
-    <Run Id="IMEM_synth_1" Type="Ft3:Synth" SrcSet="IMEM" Part="xc7a100tcsg324-1" ConstrsSet="IMEM" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/IMEM_synth_1" IncludeInArchive="true">
+    <Run Id="IMEM_synth_1" Type="Ft3:Synth" SrcSet="IMEM" Part="xc7a100tcsg324-1" ConstrsSet="IMEM" Description="Vivado Synthesis Defaults" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2016"/>
         <Step Id="synth_design"/>
       </Strategy>
-      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="impl_1" Type="Ft2:EntireDesign" Part="xc7a100tcsg324-1" ConstrsSet="constrs_1" Description="Default settings for Implementation." State="current" SynthRun="synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
