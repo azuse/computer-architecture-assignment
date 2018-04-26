@@ -206,7 +206,7 @@ module azathoth(
 
     ///////////////////////
     /// Next PC
-    reg [31:0] pcNextInst;
+    wire [31:0] pcNextInst = pc + 4;
     reg [31:0] nextPC;
 
     ///////////////////////
@@ -231,6 +231,9 @@ module azathoth(
     always @(posedge clk or posedge reset) begin
         if(reset == 1'b1) begin
             startCounter <= 0;
+            pc <= initInstAddr;
+            hi <= 0;
+            lo <= 0;
         end
         else
         begin
@@ -242,8 +245,9 @@ module azathoth(
                     startCounter <= startNo - 1;
                 end
             end else begin
-                // because pcNextInst is in combinational logic, and we need to maintain pcNextInst after pc changes(for Jal etc), we must only update pcNextInst at posedge
-                pcNextInst <= pc + 4;
+                pc <= nextPC;
+                lo <= nextLo;
+                hi <= nextHi;
             end
         end
     end
@@ -252,24 +256,17 @@ module azathoth(
 
     always @(negedge clk or posedge reset) begin
         if(reset == 1'b1) begin
-            pc <= initInstAddr;
-            hi <= 0;
-            lo <= 0;
+            
             cpuStarted <= 1;
         end
         else
         begin
             if(cpuStarted == 0) begin
-                pc <= initInstAddr;
-                hi <= 0;
-                lo <= 0;
                 if(startCounter == startNo - 1) begin
                     cpuStarted <= 1'b1;
                 end
             end else if (cpuStarted & ena) begin
-                pc <= nextPC;
-                lo <= nextLo;
-                hi <= nextHi;
+                cpuStarted <= 1;
             end
         end
 

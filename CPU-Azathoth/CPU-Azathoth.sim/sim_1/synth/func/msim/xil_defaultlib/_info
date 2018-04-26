@@ -1,0 +1,383 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dD:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.sim/sim_1/synth/func
+T_opt
+!s110 1524679375
+V:V0iZckfbA4eHmRZoAmYE2
+04 21 4 work sccomp_dataflow_oj_tb fast 0
+04 4 4 work glbl fast 0
+=1-c85b761ef6be-5ae0c2cd-30f-29a4
+o-quiet -auto_acc_if_foreign -work xil_defaultlib -L unisims_ver -L secureip -L xil_defaultlib +acc
+Z1 tCvgOpt 0
+n@_opt
+OL;O;10.5;63
+vazathoth
+Z2 !s110 1524679363
+!i10b 1
+!s100 X>NCL2iQGEEcQLczKXHlo0
+Ib19PZD[Ul9H?BQ6N5QT=T0
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+R0
+Z4 w1524679361
+Z5 8sccomp_dataflow_oj_tb_func_synth.v
+Z6 Fsccomp_dataflow_oj_tb_func_synth.v
+L0 264
+Z7 OL;L;10.5;63
+r1
+!s85 0
+31
+Z8 !s108 1524679363.000000
+Z9 !s107 ../../../../CPU-Azathoth.srcs/sim_1/new/sccomp_dataflow_oj_tb.v|sccomp_dataflow_oj_tb_func_synth.v|
+Z10 !s90 -64|-incr|-work|xil_defaultlib|+incdir+../../../../CPU-Azathoth.srcs/sources_1/new|sccomp_dataflow_oj_tb_func_synth.v|../../../../CPU-Azathoth.srcs/sim_1/new/sccomp_dataflow_oj_tb.v|
+!i113 0
+Z11 o-work xil_defaultlib -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z12 !s92 -work xil_defaultlib +incdir+../../../../CPU-Azathoth.srcs/sources_1/new -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R1
+vDMEM
+R2
+!i10b 1
+!s100 3BL0>2KF>SBQ;da9?_cOW3
+I7c7oEA<eLfJHYNPa_XhK43
+R3
+R0
+R4
+R5
+R6
+L0 16
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m
+vDMEM_blk_mem_gen_generic_cstr
+Z13 !s110 1524679364
+!i10b 1
+!s100 jlQ]S>KTB9MCUa4zB7BWg3
+ILlzSm`@H[4g3jVSKd9mm>1
+R3
+R0
+R4
+R5
+R6
+L0 77267
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m_blk_mem_gen_generic_cstr
+vDMEM_blk_mem_gen_prim_width
+R13
+!i10b 1
+!s100 hE;enbYf5OQW6:YzUHFlP1
+IzYDMTNWGUnFTXMgie8ITM2
+R3
+R0
+R4
+R5
+R6
+L0 77298
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m_blk_mem_gen_prim_width
+vDMEM_blk_mem_gen_prim_wrapper
+R13
+!i10b 1
+!s100 oQ?_27^ZfHD^[lSYzg1TJ0
+IENca0Lc4:@0KY3^Z@[C1:3
+R3
+R0
+R4
+R5
+R6
+L0 77329
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m_blk_mem_gen_prim_wrapper
+vDMEM_blk_mem_gen_top
+R13
+!i10b 1
+!s100 ]S0;XJa5AhLmnBX5j1P6D3
+IWYfK[F]NKUkIM63_j82fh2
+R3
+R0
+R4
+R5
+R6
+L0 77576
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m_blk_mem_gen_top
+vDMEM_blk_mem_gen_v8_3_3
+R13
+!i10b 1
+!s100 hh5T40mlZN8<J`;S=Ob2=1
+Idc]m_ZoQ;iYcoC;JGEb7D2
+R3
+R0
+R4
+R5
+R6
+L0 77631
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m_blk_mem_gen_v8_3_3
+vDMEM_blk_mem_gen_v8_3_3_synth
+R13
+!i10b 1
+!s100 lCE=4ef;LK^KWKLSKkK<13
+IRUMl4dB=j;>nCSNg5@XIK2
+R3
+R0
+R4
+R5
+R6
+L0 77887
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@d@m@e@m_blk_mem_gen_v8_3_3_synth
+vglbl
+R13
+!i10b 1
+!s100 Z5Hk5of9kD7e=6amYz2fD1
+IT?3Nl<lQga>Cb<Uih0laJ0
+R3
+R0
+R4
+R5
+R6
+L0 89131
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+vIMEM_dist
+R2
+!i10b 1
+!s100 ET;lnic7E_]DD;znMS^<l0
+I3D2J[aM<0dL1@R;54AgRO1
+R3
+R0
+R4
+R5
+R6
+L0 199
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@i@m@e@m_dist
+vIMEM_dist_dist_mem_gen_v8_0_10
+R13
+!i10b 1
+!s100 4QU6FGX0@4fC59z?VEeON3
+I[4Ef1]Lz?;@nUGSn]i]6B3
+R3
+R0
+R4
+R5
+R6
+L0 77928
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@i@m@e@m_dist_dist_mem_gen_v8_0_10
+vIMEM_dist_dist_mem_gen_v8_0_10_synth
+R13
+!i10b 1
+!s100 VTX;iGl><<Pz=bNc7^Gcl0
+ISl>hnFLZT`ASBYNRa<^LU0
+R3
+R0
+R4
+R5
+R6
+L0 78077
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@i@m@e@m_dist_dist_mem_gen_v8_0_10_synth
+vIMEM_dist_rom
+R13
+!i10b 1
+!s100 S?JDGVdY:_YYCYGJK_R>O1
+I7M1BYSHXBWn?fj2]f[[;X2
+R3
+R0
+R4
+R5
+R6
+L0 78092
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+n@i@m@e@m_dist_rom
+vregfile
+R13
+!i10b 1
+!s100 HhWMdRDlI7dOC:P@XKQDY3
+IQ?Kj>zJea7kCz6YUS9>j92
+R3
+R0
+R4
+R5
+R6
+L0 2037
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+vsccomp_dataflow
+R13
+!i10b 1
+!s100 IcCk`9z5PiM=8m]g^cj`41
+I]Ma2RX41ki`3Af0;1LdVV2
+R3
+R0
+R4
+R5
+R6
+L0 76028
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
+vsccomp_dataflow_oj_tb
+R13
+!i10b 1
+!s100 >9fT8FzP[Gm<Hj0afI?ih2
+IXB1icZ2dneC286_e7NLRz0
+R3
+R0
+w1524667524
+8../../../../CPU-Azathoth.srcs/sim_1/new/sccomp_dataflow_oj_tb.v
+F../../../../CPU-Azathoth.srcs/sim_1/new/sccomp_dataflow_oj_tb.v
+L0 23
+R7
+r1
+!s85 0
+31
+R8
+R9
+R10
+!i113 0
+R11
+R12
+R1
