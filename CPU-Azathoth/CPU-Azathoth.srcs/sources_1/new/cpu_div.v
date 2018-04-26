@@ -1,5 +1,5 @@
 module cpu_div #(
-    parameter MULTIPLE = 3
+    parameter MULTIPLE = 10
 ) (
     input clk_in,
     input rst,
@@ -7,13 +7,13 @@ module cpu_div #(
 );
     reg [32:0] counter1 = 0;
     reg [32:0] counter2 = 0;
-    if(MULTIPLE == 1) begin
+    /*if(MULTIPLE == 1) begin
         assign clk_out = rst ? 1'b0 : clk_in;
-    end else
-    if (MULTIPLE % 2 == 0) begin
+    end else*/
+    //if (MULTIPLE % 2 == 0) begin
         localparam M = MULTIPLE / 2;
-        reg clk_out_r = 0;
-        always @(posedge clk_in or posedge rst) begin
+        reg clk_out_r;
+        always @(posedge clk_in) begin
             if(rst) begin
                 counter1 <= 0;
                 clk_out_r <= 0;
@@ -34,7 +34,7 @@ module cpu_div #(
             end
         end
         assign clk_out = clk_out_r;
-    end else begin
+    /*end else begin
         localparam M = MULTIPLE / 2;
         reg clk_out_1 = 0;
         reg clk_out_2 = 0;
@@ -81,5 +81,5 @@ module cpu_div #(
         end
 
         assign clk_out = clk_out_1 | clk_out_2;
-    end
+    end*/
 endmodule

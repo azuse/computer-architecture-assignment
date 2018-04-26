@@ -1,0 +1,9 @@
+Vivado Simulator 2016.2
+Copyright 1986-1999, 2001-2016 Xilinx, Inc. All Rights Reserved.
+Running: D:/SoftPath/Xilinx/Vivado/2016.2/bin/unwrapped/win64.o/xelab.exe -wto 0aafb0004eda49b4a5d56de844040277 --debug typical --relax --mt 2 --maxdelay -L xil_defaultlib -L simprims_ver -L secureip --snapshot cpu_div_tb_time_synth -transport_int_delays -pulse_r 0 -pulse_int_r 0 xil_defaultlib.cpu_div_tb xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+WARNING: [VRFC 10-426] cannot find port clk_out on this module [D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.srcs/sim_1/new/cpu_div_tb.v:29]
+Completed static elaboration
+Starting simulation data flow analysis
+ERROR: [XSIM 43-3250] File D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.sim/sim_1/synth/timing/cpu_div_tb_time_synth.v, line 2034. Unsupported named port connection association : .clk_in(clk_in) where formal is alias port.
