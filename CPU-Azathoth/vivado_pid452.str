@@ -1,0 +1,144 @@
+/*
+
+Vivado v2016.2 (64-bit)
+SW Build 1577090 on Thu Jun  2 16:32:40 MDT 2016
+Process ID: 452
+
+Current time: 	4/26/18 12:23:58 PM CST
+Time zone: 	China Standard Time (Asia/Shanghai)
+
+OS: Windows 10
+Version: 10.0
+Architecture: amd64
+Available processors (cores): 4
+
+Screen size: 1536x864
+Screen resolution (DPI): 96
+Available screens: 1
+Default font: family=SimSun,name=ËÎÌו,style=plain,size=12
+
+Java version: 	1.8.0_66 64-bit
+Java home: 	D:/SoftPath/Xilinx/Vivado/2016.2/tps/win64/jre
+
+User name: 	Shun Feng
+User home directory: C:/Users/Shun Feng
+User working directory: D:/Projects/CompArch/CPU-Azathoth
+User country: 	CN
+User language: 	zh
+User locale: 	zh_CN
+
+RDI Base root directory: D:/SoftPath/Xilinx/Vivado
+RDI Data directory: D:/SoftPath/Xilinx/Vivado/2016.2/data
+RDI Bin directory: D:/SoftPath/Xilinx/Vivado/2016.2/bin
+
+Vivado preferences path: C:/Users/Shun Feng/AppData/Roaming/Xilinx/Vivado/2016.2/vivado.ini
+Vivado layouts directory: C:/Users/Shun Feng/AppData/Roaming/Xilinx/Vivado/2016.2/layouts
+
+GUI allocated memory:	180 MB
+GUI max memory:		3,052 MB
+Engine allocated memory: 419 MB
+
+*/
+
+// TclEventType: START_GUI
+// Tcl Message: start_gui 
+// TclEventType: PROJECT_OPEN_DIALOG
+// bL:g (cv:JFrame):  Open Project : addNotify
+// Opening Vivado Project: D:\Projects\CompArch\CPU-Azathoth\CPU-Azathoth.xpr. Version: Vivado v2016.2 
+// TclEventType: DEBUG_PROBE_SET_CHANGE
+// TclEventType: MSGMGR_MOVEMSG
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_COMPLETED
+// TclEventType: RUN_CURRENT
+// [GUI Memory]: 33 MB (+32604kb) [00:00:08]
+// [Engine Memory]: 413 MB (+281274kb) [00:00:08]
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 49 MB (+14909kb) [00:00:12]
+// [Engine Memory]: 457 MB (+25149kb) [00:00:12]
+// [GUI Memory]: 55 MB (+3213kb) [00:00:16]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Tcl Message: open_project D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.xpr 
+// Tcl Message: Scanning sources... Finished scanning sources 
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/SoftPath/Xilinx/Vivado/2016.2/data/ip'. 
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// HMemoryUtils.trashcanNow. Engine heap size: 478 MB. GUI used memory: 36 MB. Current time: 4/26/18 12:24:06 PM CST
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 487 MB (+6715kb) [00:00:18]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// [Engine Memory]: 526 MB (+15857kb) [00:00:22]
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Project name: CPU-Azathoth; location: D:/Projects/CompArch/CPU-Azathoth; part: xc7a100tcsg324-1
+// Tcl Message: open_project: Time (s): cpu = 00:00:21 ; elapsed = 00:00:16 . Memory (MB): peak = 783.703 ; gain = 140.055 
+dismissDialog("Open Project"); // bL:g (cv:JFrame)
+// TclEventType: DG_GRAPH_STALE
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+// Tcl Message: update_compile_order -fileset sources_1 
+// PAPropertyPanels.initPanels (sccomp_dataflow_foroj.v) elapsed time: 0.2s
+// Elapsed time: 25 seconds
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, sccomp_dataflow (sccomp_dataflow_foroj.v)]", 2, true); // z:k (G:JPanel, cv:JFrame) - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Design Sources, sccomp_dataflow (sccomp_dataflow_foroj.v)]", 2, true, false, false, false, false, true); // z:k (G:JPanel, cv:JFrame) - Double Click - Node
+// [GUI Memory]: 59 MB (+1632kb) [00:00:56]
+// [GUI Memory]: 63 MB (+315kb) [00:00:57]
+// Elapsed time: 32 seconds
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Simulation Sources]", 13); // z:k (G:JPanel, cv:JFrame)
+expandTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Simulation Sources, sim_1]", 14); // z:k (G:JPanel, cv:JFrame)
+// [GUI Memory]: 70 MB (+4135kb) [00:01:22]
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Simulation, Run Simulation]", 11, false); // x:Y (w:G, cv:JFrame)
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Simulation Sources, sim_1, sccomp_dataflow_oj_tb (sccomp_dataflow_oj_tb.v)]", 16, true); // z:k (G:JPanel, cv:JFrame) - Node
+selectTree(PAResourceEtoH.FileSetPanel_FILE_SET_PANEL_TREE, "[root, Simulation Sources, sim_1, sccomp_dataflow_oj_tb (sccomp_dataflow_oj_tb.v)]", 16, true, false, false, false, false, true); // z:k (G:JPanel, cv:JFrame) - Double Click - Node
+// [GUI Memory]: 75 MB (+2196kb) [00:01:27]
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 275, 168); // bH:N (JPanel:JComponent, cv:JFrame)
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 53, 124); // bH:N (JPanel:JComponent, cv:JFrame)
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 55, 165); // bH:N (JPanel:JComponent, cv:JFrame)
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 69, 130); // bH:N (JPanel:JComponent, cv:JFrame)
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 64, 159); // bH:N (JPanel:JComponent, cv:JFrame)
+// TclEventType: DG_GRAPH_STALE
+// TclEventType: FILE_SET_CHANGE
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Simulation, Run Simulation]", 11, false); // x:Y (w:G, cv:JFrame)
+selectMenuItem(PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL, "Run Behavioral Simulation"); // af:JMenuItem (am:JPopupMenu, cv:JFrame)
+// Run Command: PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL
+// TclEventType: DG_GRAPH_STALE
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: DG_UPDATE_GRAPH
+// f:bL (cv:JFrame):  Run Simulation : addNotify
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Tcl Message: launch_simulation -install_path D:/SoftPath/modelsim/win64 
+// Tcl Message: INFO: [USF-ModelSim-69] Executing 'COMPILE and ANALYZE' step in 'D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.sim/sim_1/behav' 
+// HMemoryUtils.trashcanNow. Engine heap size: 551 MB. GUI used memory: 39 MB. Current time: 4/26/18 12:25:40 PM CST
+// Tcl Message: Error: ** Error: (vish-17) Recursive reference in 'others' clause in "D:/SoftPath/modelsim/win64/../modelsim.ini" to "D:/xilinx_modelsim_lib/modelsim.ini". Reading D:/SoftPath/modelsim/tcl/vsim/pref.tcl  # 10.5  # do {sccomp_dataflow_oj_tb_compile.do} # Model Technology ModelSim SE-64 vmap 10.5 Lib Mapping Utility 2016.02 Feb 13 2016 # vmap xil_defaultlib msim/xil_defaultlib  # Modifying D:\xilinx_modelsim_lib\modelsim.ini # Model Technology ModelSim SE-64 vmap 10.5 Lib Mapping Utility 2016.02 Feb 13 2016 # vmap xpm msim/xpm  # Modifying D:\xilinx_modelsim_lib\modelsim.ini 
+// Tcl Message: run_program: Time (s): cpu = 00:00:01 ; elapsed = 00:00:05 . Memory (MB): peak = 800.613 ; gain = 0.000 
+// Tcl Message: INFO: [USF-ModelSim-69] 'compile' step finished in '5' seconds INFO: [USF-ModelSim-4] ModelSim::Simulate design INFO: [USF-ModelSim-69] Executing 'SIMULATE' step in 'D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.sim/sim_1/behav' 
+// Tcl Message: Program launched (PID=6584) 
+// Tcl Message: launch_simulation: Time (s): cpu = 00:00:03 ; elapsed = 00:00:06 . Memory (MB): peak = 800.613 ; gain = 0.000 
+// 'e' command handler elapsed time: 6 seconds
+dismissDialog("Run Simulation"); // f:bL (cv:JFrame)
+// Elapsed time: 44 seconds
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 61, 157); // bH:N (JPanel:JComponent, cv:JFrame)
+selectCodeEditor("sccomp_dataflow_oj_tb.v", 79, 167); // bH:N (JPanel:JComponent, cv:JFrame)
+// [GUI Memory]: 79 MB (+205kb) [00:02:42]
+// TclEventType: DG_GRAPH_STALE
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: DG_UPDATE_GRAPH
+// TclEventType: DG_ANALYSIS_MSG_RESET
+// TclEventType: DG_UPDATE_GRAPH
+selectTree(PAResourceEtoH.FlowNavigatorTreePanel_FLOW_NAVIGATOR_TREE, "[, Simulation, Run Simulation]", 11, false); // x:Y (w:G, cv:JFrame)
+selectMenuItem(PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL, "Run Behavioral Simulation"); // af:JMenuItem (am:JPopupMenu, cv:JFrame)
+// Run Command: PAResourceCommand.PACommandNames_SIMULATION_RUN_BEHAVIORAL
+// TclEventType: FILE_SET_CHANGE
+// f:bL (cv:JFrame):  Run Simulation : addNotify
+// TclEventType: FILE_SET_CHANGE
+// TclEventType: FILE_SET_OPTIONS_CHANGE
+// Tcl Message: launch_simulation -install_path D:/SoftPath/modelsim/win64 
+// Tcl Message: INFO: [USF-ModelSim-69] 'compile' step finished in '3' seconds INFO: [USF-ModelSim-4] ModelSim::Simulate design INFO: [USF-ModelSim-69] Executing 'SIMULATE' step in 'D:/Projects/CompArch/CPU-Azathoth/CPU-Azathoth.sim/sim_1/behav' 
+// Tcl Message: Program launched (PID=4040) 
+// 'e' command handler elapsed time: 4 seconds
+dismissDialog("Run Simulation"); // f:bL (cv:JFrame)
