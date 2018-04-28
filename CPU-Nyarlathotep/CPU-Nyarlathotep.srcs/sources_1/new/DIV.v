@@ -1,33 +1,16 @@
 `timescale 1ns / 1ns
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2018/03/26 16:04:25
-// Design Name: 
-// Module Name: DIV
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module DIV(
+    input clk,
+
     input [31:0] dividend,
     input [31:0] divisor,
     input isUnsigned,
     output [31:0] q,
-    output [31:0] r
+    output [31:0] r,
+    output busy
     );
-
+    assign busy = 1'b0;
 
     //reg [32:0] r_dividend = 0;
     wire [32:0] r_dividend = {1'b0, isUnsigned ? dividend : dividend[31] ? -dividend : dividend};

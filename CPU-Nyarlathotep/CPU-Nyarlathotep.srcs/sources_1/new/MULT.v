@@ -1,15 +1,20 @@
 `timescale 1ns / 1ps
 
 module MULT (
+    input clk,
+    
     input isUnsigned,
     input signed [31:0] a,
     input signed [31:0] b,
     output reg signed [63:0] z,
-    output carry
+    output carry,
+    output busy
 );
 
 reg [31:0] ax, bx;
 wire [63:0] zx;
+
+assign busy = 1'b0;
 
 always @(a or b or isUnsigned) begin
     if(isUnsigned == 1'b1) begin

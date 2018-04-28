@@ -1,6 +1,7 @@
 `timescale 1ns/1ns
 
 module ALU(
+    input clk,
     input [31:0] A,
     input [31:0] B,
     input [4:0] modeSel,        //Mode Select, one of the ALU_XXXX constants
@@ -10,7 +11,8 @@ module ALU(
     output isRZero,
     output reg isCarry,
     output isRNegative,
-    output reg isOverflow
+    output reg isOverflow,
+    output busy
 
 );
     `include "aluHeader.vh"
@@ -31,25 +33,36 @@ module ALU(
     wire opIsUnsigned = modeSel[4];
 
     wire [5:0] clzResult;
+    wire clzBusy;
+
     wire [63:0] multResult;
     wire multCarry;
+    wire multBusy;
+
     wire [31:0] divQuotient;
     wire [31:0] divRemainder;
+    wire divBusy;
 
-    CLZAlgorithm clzblock (A, clzResult);
+    assign busy = multBusy | divBusy | clzBusy;
+
+    CLZAlgorithm clzblock (A, clzResult, clzBusy);
     MULT multiplier (
+        .clk(clk),
         .isUnsigned(opIsUnsigned),
         .a(A),
         .b(B),
         .z(multResult),
-        .carry(multCarry)
+        .carry(multCarry),
+        .busy(multBusy)
     );
     DIV divider (
+        .clk(clk),
         .dividend(A),
         .divisor(B),
         .isUnsigned(opIsUnsigned),
         .q(divQuotient),
-        .r(divRemainder)
+        .r(divRemainder),
+        .busy(divBusy)
     );
 
     assign isRZero = (R == 32'h0);

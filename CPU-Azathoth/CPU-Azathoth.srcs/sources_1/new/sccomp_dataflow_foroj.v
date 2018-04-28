@@ -1,6 +1,6 @@
 module sccomp_dataflow(
     input clk_in,
-    output clk_afterDiv,
+    input clk_afterDiv,
     input reset,
     input cpuEna_n,
     output [31:0] inst,
@@ -13,7 +13,7 @@ module sccomp_dataflow(
     
     //////////////////
     /// Frequency divider
-    cpu_div #(100) cpu_clk(clk_in, reset, clk);
+    cpu_div #(1) cpu_clk(clk_in, reset, clk);
     assign clk_afterDiv = clk;
 
     ////////////////

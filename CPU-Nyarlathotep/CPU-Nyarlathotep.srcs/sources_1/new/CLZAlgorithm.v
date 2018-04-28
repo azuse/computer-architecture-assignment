@@ -1,8 +1,9 @@
 module CLZAlgorithm(
     input [31:0] A,
-    output [5:0] R  //Max: 32, 6 bits
+    output [5:0] R,  //Max: 32, 6 bits
+    output busy
 );
-    
+    assign busy = 1'b0;
     generate
         genvar i;
 
