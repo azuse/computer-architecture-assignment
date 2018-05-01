@@ -6,7 +6,7 @@ initial
 begin
   clk=0;
   rst=1;
-  #3 rst=0;
+  #12 rst=0;
 end
 always begin
   #10 clk=~clk;

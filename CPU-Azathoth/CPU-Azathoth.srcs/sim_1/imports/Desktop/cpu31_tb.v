@@ -6,7 +6,7 @@ initial
 begin
   clk=0;
   rst=1;
-  #12 rst=0;
+  #10 rst=0;
 end
 always begin
   #10 clk=~clk;
@@ -14,11 +14,9 @@ end
 wire [31:0] inst;
 wire [31:0] pc;
 wire [31:0] addr;
-sccomp_dataflow cpu_inst(
-  .clk_in(clk),
-  .reset(rst),
-  .inst(inst),
-  .pc(pc),
-  .addr(addr)
+machine cpu_inst(
+  .clk(clk),
+  .rst(rst),
+  .pc(pc)
 );
 endmodule // cpu_tb
