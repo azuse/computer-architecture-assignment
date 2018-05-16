@@ -79,7 +79,7 @@ module nyarlathotep(
         .isOverflow(aluOverflow),
         .busy(aluBusy)
     );
-    
+
     ///////////////
     /// Extender
     ///
@@ -281,14 +281,9 @@ module nyarlathotep(
             end
         end
     end
+    
+    localparam exceptionEntry = 32'h00000004;
 
-    /// Deciding nextPC
-    reg [31:0] epc;
-    
-    always @(*) begin
-        epc = 32'habcdef12;
-    end
-    
     always @(*) begin
         if(cpuRunning) begin
             if(iJr)
@@ -306,27 +301,43 @@ module nyarlathotep(
             else if (iJalr)
                 nextPC = rfRData1;  //GPR[rs]
             else if (iBreak)
-                nextPC = 32'h0000003c;
+                nextPC = exceptionEntry;
             else if (iSyscall)
-                nextPC = 32'h0000003c;
+                nextPC = exceptionEntry;
             else if (iEret)
-                nextPC = epc;
+                nextPC = cp0ExecAddr;
             else if (iTeq)
-                nextPC = 32'h0000003c;
+                nextPC = exceptionEntry;
             else
                 nextPC = pcPlus4;
         end else
             nextPC = 32'hABABABAB;
     end
 
+
+    `define SYSCALLCAUSE  'b01000
+    `define BREAKCAUSE  'b01001
+    `define TEQCAUSE 'b011010
     // Instruction-specific datapath
     reg [4:0] bytePos;
-    reg [31:0] exec_addr;
+    //reg [31:0] exec_addr;
+    reg [31:0] cp0ExecAddr;
+    reg [4:0] cp0Addr;
+    reg [31:0] cp0WData;
+    reg [31:0] cp0RData;
+    reg cp0Exception;
+    wire cp0Intr = `DISABLE;
+    wire [31:0] cp0Status;
     reg trap;
     localparam BigEndianCPU = 1'b0;
     always @(*) begin
         exec_addr = 0;
         trap = 0;
+
+        cp0ExecAddr = 32'h0;
+        cp0Exception = `DISABLE;
+        cp0Addr = 32'h0;
+        cp0WData = 32'h0;
 
         extend16S_1In = 32'hxxxxxxxx;
         extend16S_2In = 32'hxxxxxxxx;
@@ -838,10 +849,12 @@ module nyarlathotep(
                 
                 dmemAIn = aluR;
             end else if (iBreak) begin
-                exec_addr = pcPlus4;
+                cp0Exception = `ENABLE;
+                cp0Cause = `BREAKCAUSE;
                 // Do nothing
             end else if (iSyscall) begin
-                exec_addr = pcPlus4;
+                cp0Exception = `ENABLE;
+                cp0Cause = `SYSCALLCAUSE;
             end else if (iEret) begin
                 rfWe = `DISABLE; //Do nothing
             end else if (iMfhi) begin
@@ -859,9 +872,14 @@ module nyarlathotep(
                 rfRAddr1 = rs;
                 nextLo = rfRData1;
             end else if (iMfc0) begin
-                rfWe = `DISABLE; //Do nothing
+                cp0Addr = rd;
+                rfWe = `ENABLE;
+                rfWAddr = rt;
+                rfWData = cp0RData;
             end else if (iMtc0) begin
-                rfWe = `DISABLE; //Do nothing
+                rfRAddr1 = rt;
+                cp0Addr = rd;
+                cp0WData = rfRData1;
             end else if (iClz) begin
                 rfRAddr1 = rs;
                 aluA = rfRData1;
@@ -879,11 +897,34 @@ module nyarlathotep(
                 aluB = rfRData2;
                 aluModeSel = ALU_EQU;
 
-                if(aluR[0])
-                    exec_addr = pcPlus4;
-
+                if(aluR[0]) begin
+                    cp0Cause = `TEQCAUSE;
+                    cp0Exception = `ENABLE;
+                end
                 trap = aluR[0];
             end
         end
     end
+
+    ///////////////
+    /// Trapezohedron - CP0
+    
+    Trapezohedron cp0(
+        .clk(clk),
+        .rst(rst),
+        .mfc0(iMfc0),
+        .mtc0(iMtc0),
+        .pc(pc),
+        .addr(cp0Addr),
+        .data(cp0WData).
+        .execption(cp0Exception),
+        .eret(iEret),
+        .cause(cp0Cause),
+        .intr(cp0Intr),
+
+        .rdata(cp0RData),
+        .status(cp0Status),
+        .exc_addr(cp0ExecAddr)
+    );
+
 endmodule
