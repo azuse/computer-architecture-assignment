@@ -2,7 +2,7 @@
 
 module MULT (
     input clk,
-    
+    input ena,
     input isUnsigned,
     input signed [31:0] a,
     input signed [31:0] b,
@@ -11,10 +11,26 @@ module MULT (
     output busy
 );
 
+reg lastEna;
+reg [3:0] counter;
+localparam COUNTER_CYCLE = 15;
+
+always @(posedge clk) begin
+    // negedge of main clk
+    lastEna <= ena;
+    if (ena != lastEna)
+    begin
+        counter <= 0;
+    end
+    else if (ena) begin
+        counter <= counter + 1;
+    end
+end
+
+assign busy = ena & (counter != COUNTER_CYCLE);
+
 reg [31:0] ax, bx;
 wire [63:0] zx;
-
-assign busy = 1'b0;
 
 always @(a or b or isUnsigned) begin
     if(isUnsigned == 1'b1) begin

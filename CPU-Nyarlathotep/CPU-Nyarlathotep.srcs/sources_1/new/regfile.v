@@ -8,6 +8,7 @@ module regfile #(
     input clk,
     input rst,
     input we,
+    input cpuPaused,
     input [numlog-1:0] raddr1,
     input [numlog-1:0] raddr2,
     input [numlog-1:0] waddr,
@@ -32,9 +33,11 @@ module regfile #(
         end else begin
             if (array_reg[0] != 0)
                 array_reg[0] <= 0;
-            if(we) begin
-                if(waddr != 0)  // zero register $zero
-                    array_reg[waddr] <= wdata;
+            if (~cpuPaused) begin
+                if(we) begin
+                    if(waddr != 0)  // zero register $zero
+                        array_reg[waddr] <= wdata;
+                end
             end
         end
     end

@@ -2,7 +2,7 @@
 
 module DIV(
     input clk,
-
+    input ena,
     input [31:0] dividend,
     input [31:0] divisor,
     input isUnsigned,
@@ -10,7 +10,24 @@ module DIV(
     output [31:0] r,
     output busy
     );
-    assign busy = 1'b0;
+    
+    reg lastEna;
+    reg [3:0] counter;
+    localparam COUNTER_CYCLE = 15;
+
+    always @(posedge clk) begin
+        // negedge of main clk
+        lastEna <= ena;
+        if (ena != lastEna)
+        begin
+            counter <= 0;
+        end
+        else if (ena) begin
+            counter <= counter + 1;
+        end
+    end
+
+    assign busy = ena & (counter != COUNTER_CYCLE);
 
     //reg [32:0] r_dividend = 0;
     wire [32:0] r_dividend = {1'b0, isUnsigned ? dividend : dividend[31] ? -dividend : dividend};

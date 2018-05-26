@@ -2,7 +2,7 @@
 
 module MULT_empty (
     input clk,
-    
+    input ena,
     input isUnsigned,
     input signed [31:0] a,
     input signed [31:0] b,

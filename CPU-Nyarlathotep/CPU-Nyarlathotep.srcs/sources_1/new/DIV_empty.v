@@ -2,7 +2,7 @@
 
 module DIV_empty(
     input clk,
-
+    input ena,
     input [31:0] dividend,
     input [31:0] divisor,
     input isUnsigned,

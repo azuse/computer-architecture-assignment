@@ -1,9 +1,27 @@
 module CLZAlgorithm(
     input [31:0] A,
+    input ena,
     output [5:0] R,  //Max: 32, 6 bits
     output busy
 );
-    assign busy = 1'b0;
+    reg lastEna;
+    reg [3:0] counter;
+    localparam COUNTER_CYCLE = 4;
+
+    always @(posedge clk) begin
+        // negedge of main clk
+        lastEna <= ena;
+        if (ena != lastEna)
+        begin
+            counter <= 0;
+        end
+        else if (ena) begin
+            counter <= counter + 1;
+        end
+    end
+
+    assign busy = ena & (counter != COUNTER_CYCLE);
+
     generate
         genvar i;
 

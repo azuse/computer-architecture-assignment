@@ -13,7 +13,7 @@ module computer(
     
     //////////////////
     /// Frequency divider
-    cpu_div #(2) cpu_clk(clk_in, reset, clk);
+    cpu_div #(4) cpu_clk(clk_in, reset, clk);
     assign clk_afterDiv = clk;
 
     ////////////////
