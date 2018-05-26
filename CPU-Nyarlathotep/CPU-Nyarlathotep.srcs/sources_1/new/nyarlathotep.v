@@ -32,7 +32,7 @@ module nyarlathotep(
     assign imemWe = `DISABLE;
     
     reg cpuStarted;
-    assign cpuRunning = cpuStarted & ena;
+    assign cpuRunning = cpuStarted;
     wire cpuPaused;
 
     `include "aluHeader.vh"
@@ -291,7 +291,7 @@ module nyarlathotep(
 
     `define SYSCALLCAUSE  5'b01000
     `define BREAKCAUSE  5'b01001
-    `define TEQCAUSE 5'b011010
+    `define TEQCAUSE 5'b01101
     // Instruction-specific datapath
     reg [4:0] bytePos;
     //reg [31:0] exec_addr;
@@ -307,45 +307,51 @@ module nyarlathotep(
     reg [3:0] dmemAWe_orig;
     assign dmemAWe = dmemAWe_orig & {4{cpuRunning & ~cpuPaused}};
     localparam BigEndianCPU = 1'b0;
+
     always @(*) begin
         if (cpuRunning) begin
-            bytePos = ((iLbu | iLb | iSb) ? {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}} : 5'h00) | ((iLhu | iLh | iSh) ? {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0} : 5'h00);
+            
 
-            rfRAddr1 = (iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu |iSllv | iSrlv | iSrav | iJr | iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSw | iBeq | iBne | iSlti | iSltiu | iDiv | iDivu | iMult | iMul | iMultu | iBgez | iJalr | iLbu | iLhu | iLb | iLh | iSb | iSh | iMthi | iMtlo | iClz | iTeq) ? rs : 32'h0;
+            rfRAddr1 = rs;
+            rfRAddr2 = rt;
 
-            rfRAddr2 = (iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iSw | iBeq | iBne | iDiv | iDivu | iMult | iMul | iMultu | iSb | iSh | iMtc0 | iTeq) ? rt : 32'h0;
-
-            aluA = (iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSw | iBeq | iBne | iSlti | iSltiu | iDiv | iDivu | iMult | iMul | iMultu | iClz | iTeq) ? rfRData1 : (iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iSb | iSh) ? rfRData2 : 32'h0;
-
-            aluB = ((iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iBeq | iBne | iDiv | iDivu | iMult | iMul | iMultu | iTeq) ? rfRData2 : 32'h0) 
-            | ((iSll | iSrl | iSra) ? shamt : 32'h0)
-            | ((iSllv | iSrlv | iSrav) ? rfRData1 : 32'h0)
-            | ((iAddi | iAddiu | iLw | iSw | iSlti | iSltiu) ? extend16S_1Out : 32'h0)
-            | ((iAndi | iOri | iXori) ? extend16UOut : 32'h0)
-            | ((iSb) ? (bytePos[1:0] << 3) : 32'h0)
-            | ((iSh) ? (bytePos[1] ? 16 : 0) : 32'h0);
-
-            aluModeSel = ((iAdd | iAddi) ? ALU_SADD : 5'h00) | ((iAddu | iAddiu | iLw | iSw) ? ALU_UADD: 5'h00) | ((iSub) ? ALU_SSUB : 5'h00) | ((iSubu) ? ALU_USUB : 5'h00) | ((iAnd | iAndi) ? ALU_AND : 5'h00) | ((iOr | iOri) ? ALU_OR : 5'h00) | ((iXor | iXori) ? ALU_XOR : 5'h00) | ((iNor) ? ALU_NOR : 5'h00) | ((iSlt | iSlti) ? ALU_SLES : 5'h00) | ((iSltu | iSltiu) ? ALU_ULES : 5'h00) | ((iSll | iSb | iSh) ? ALU_SL : 5'h00) | ((iSrl | iSrlv) ? ALU_SRL : 5'h00) | ((iSra | iSrav) ? ALU_SRA : 5'h00) | ((iAdd | iAddi) ? ALU_SADD : 5'h00) | ((iBeq | iBne | iTeq) ? ALU_EQU : 5'h00) | ((iDiv) ? ALU_SDIV : 5'h00) | ((iDivu) ? ALU_UDIV : 5'h00) | ((iMult | iMul) ? ALU_SMUL : 5'h00) | ((iMultu) ? ALU_UMUL : 5'h00) | ((iClz) ? ALU_CLZ : 5'h00);
+            aluA = ((((iAdd | iAddu | iSub | iSubu) | (iAnd | iOr | iXor | iNor)) | ((iSlt | iSltu | iAddi) | (iAddiu | iAndi))) | (iOri | iXori | iLw | iSw | iBeq | iBne | iSlti | iSltiu | iDiv | iDivu | iMult | iMul | iMultu | iClz | iTeq)) ? rfRData1 : (iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iSb | iSh) ? rfRData2 : 32'h0;
+            
+            aluModeSel = (iAdd | iAddi) ? ALU_SADD : (iAddu | iAddiu | iLw | iSw) ? ALU_UADD: (iSub) ? ALU_SSUB : (iSubu) ? ALU_USUB : (iAnd | iAndi) ? ALU_AND : (iOr | iOri) ? ALU_OR : (iXor | iXori) ? ALU_XOR : (iNor) ? ALU_NOR : (iSlt | iSlti) ? ALU_SLES : (iSltu | iSltiu) ? ALU_ULES : (iSll | iSb | iSh) ? ALU_SL : (iSrl | iSrlv) ? ALU_SRL : (iSra | iSrav) ? ALU_SRA : (iAdd | iAddi) ? ALU_SADD : (iBeq | iBne | iTeq) ? ALU_EQU : (iDiv) ? ALU_SDIV : (iDivu) ? ALU_UDIV : (iMult | iMul) ? ALU_SMUL : (iMultu) ? ALU_UMUL : (iClz) ? ALU_CLZ : 5'h00;
 
             rfWe = ((iAdd | iSub) & (aluOverflow ? `DISABLE : `ENABLE)) | ((iAddu | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSlti | iSltiu | iLui | iJal | iMul | iJalr | iLbu | iLhu | iLb | iLh | iMfhi | iMflo | iMfc0 | iClz) & (`ENABLE));
 
             rfWAddr = ((iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iMul | iJalr | iMfhi | iMflo | iClz) ? rd : 5'h0) | ((iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSlti | iSltiu | iLui | iLbu | iLhu | iLb | iLh | iMfc0) ? rt : 5'h0) | ((iJal) ? 5'd31 : 5'h0);
 
-            rfWData = ((iLw) ? dmemAOut : 32'h0) | ((iLui) ? {imm, 16'h0} : 32'h0) | ((iJal | iJalr) ? pcPlus4 : 32'h0) | ((iLbu) ? extend8UOut : 32'h0) | ((iLhu) ? extend16UOut : 32'h0) | ((iLb) ? extend8SOut : 32'h0) | ((iLh) ? extend16S_2Out : 32'h0)  | ((iMfhi) ? hi : 32'h0) | ((iMflo) ? lo : 32'h0)  | ((iMfc0) ? cp0RData : 32'h0) | ((~iLw & ~iLui & ~iJal & ~iJalr & ~iLbu & ~iLhu & ~iLb & ~iLh & ~iMfhi & ~iMflo & ~iMfc0) ? aluR : 32'h0);
+            rfWData = (iLw) ? dmemAOut : (iLui) ? {imm, 16'h0} : (iJal | iJalr) ? pcPlus4 : (iLbu) ? extend8UOut : (iLhu) ? extend16UOut : (iLb) ? extend8SOut : (iLh) ? extend16S_2Out : (iMfhi) ? hi : (iMflo) ? lo : (iMfc0) ? cp0RData : aluR;
 
             extend16S_1In = imm;
 
-            extend16UIn = ((iAndi | iOri | iXori) ? imm : 16'h0) | ((iLhu) ? dmemAOut[8 * bytePos +: 16] : 16'h0);
+            
 
             dmemAEn = ((iLw | iSw | iLbu | iLhu | iLb | iLh | iSb | iSh) & `ENABLE);
 
             dmemAAddr = ((iLw | iSw) ? aluR : uaddR);
+            
+            bytePos = (iLbu | iLb | iSb) ? {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}} : (iLhu | iLh | iSh) ? {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0} : 5'h00;
 
-            dmemAWe_orig = ((iSw) ? 4'hf : 4'h0) | ((iSb) ? {(bytePos[1:0] == 2'h3), (bytePos[1:0] == 2'h2), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0)} : 4'h0) | ((iSh) ? {(bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0), (bytePos[1:0] == 2'h0)} : 4'h0);
+            extend16UIn = ((iAndi | iOri | iXori) ? imm : 16'h0) | ((iLhu) ? dmemAOut[8 * bytePos +: 16] : 16'h0);
+            
+            aluB = (iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iBeq | iBne | iDiv | iDivu | iMult | iMul | iMultu | iTeq) ? rfRData2 :
+            (iSll | iSrl | iSra) ? shamt : 
+            (iSllv | iSrlv | iSrav) ? rfRData1 : 
+            (iAddi | iAddiu | iLw | iSw | iSlti | iSltiu) ? extend16S_1Out :
+            (iAndi | iOri | iXori) ? extend16UOut :
+            (iSb) ? (bytePos[1:0] << 3) :
+            (iSh) ? (bytePos[1] ? 16 : 0) : 0;
+            
+            
 
-            dmemAIn = (iSw ? rfRData2 : 32'h0) | ((iSb | iSh) ? aluR : 32'h0);
+            dmemAWe_orig = (iSw) ? 4'hf : (iSb) ? {(bytePos[1:0] == 2'h3), (bytePos[1:0] == 2'h2), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0)} : (iSh) ? {(bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0), (bytePos[1:0] == 2'h0)} : 4'h0;
 
-            uaddA = ((iBeq | iBne | iBgez) ? pcPlus4 : 32'h0) | ((iLbu | iLhu | iLb | iLh | iSb | iSh) ? extend16S_1Out : 32'h0);
+            dmemAIn = iSw ? rfRData2 : (iSb | iSh) ? aluR : 32'h0;
+
+            uaddA = (iBeq | iBne | iBgez) ? pcPlus4 : (iLbu | iLhu | iLb | iLh | iSb | iSh) ? extend16S_1Out : 32'h0;
 
             uaddB = (iBeq | iBne | iBgez) ? (extend16S_1Out << 2) : rfRData1;
 
@@ -361,65 +367,69 @@ module nyarlathotep(
 
             cp0Exception = ((iBreak | iSyscall | (iTeq & aluR[0])) & `ENABLE);
 
-            cp0Cause = (iBreak ? {25'h0, `BREAKCAUSE, 2'h0} : 32'h0) | (iSyscall ? {25'h0, `SYSCALLCAUSE, 2'h0} : 32'h0) | ((iTeq & aluR[0]) ? {25'h0, `TEQCAUSE, 2'h0} : 32'h0);
+            cp0Cause = iBreak ? {25'h0, `BREAKCAUSE, 2'h0} : iSyscall ? {25'h0, `SYSCALLCAUSE, 2'h0} : (iTeq & aluR[0]) ? {25'h0, `TEQCAUSE, 2'h0} : 32'h0;
 
             cp0Addr = rd;
 
-            nextPC = ((iJr | iJalr) ? rfRData1 : 32'h0) | ((iBeq) ? (aluR[0] ? uaddR : pcPlus4) : 32'h0) | ((iBne) ? (aluR[0] ? pcPlus4 : uaddR) : 32'h0) | ((iJ | iJal) ? {pc[31:28], index, 2'b0} : 32'h0) | ((iBgez) ? (rfRData1[31] ? pcPlus4 : uaddR) : 32'h0) | ((iBreak | iSyscall | iTeq) ? (exceptionEntry) : 32'h0) | ((iEret) ? (cp0ExecAddr) : 32'h0) | ((~iJr & ~iJalr & ~iBeq & ~iBne & ~iJ & ~iJal & ~iBgez & ~iBreak & ~iSyscall & ~iTeq & ~iEret) ? pcPlus4 : 32'h0);
+            nextPC = (iJr | iJalr) ? rfRData1 : (iBeq) ? (aluR[0] ? uaddR : pcPlus4) : (iBne) ? (aluR[0] ? pcPlus4 : uaddR) : (iJ | iJal) ? {pc[31:28], index, 2'b0} : (iBgez) ? (rfRData1[31] ? pcPlus4 : uaddR) : (iBreak | iSyscall | iTeq) ? (exceptionEntry) : (iEret) ? (cp0ExecAddr) : pcPlus4;
 
             trap = (iTeq & aluR[0]);
+
+            cp0WData = rfRData1;
         end else begin
-            bytePos = 0;
+            bytePos = 'hx;
 
-            rfRAddr1 = 0;
+            rfRAddr1 = 'hx;
 
-            rfRAddr2 = 0;
+            rfRAddr2 = 'hx;
 
-            aluA = 0;
+            aluA = 'hx;
 
-            aluB = 0;
+            aluB = 'hx;
 
-            aluModeSel = 0;
+            aluModeSel = 'hx;
 
             rfWe = 0;
 
-            rfWAddr = 0;
+            rfWAddr = 'hx;
 
-            rfWData = 0;
+            rfWData = 'hx;
 
-            extend16S_1In = 0;
+            extend16S_1In = 'hx;
 
-            extend16UIn = 0;
+            extend16UIn = 'hx;
 
             dmemAEn = 0;
 
-            dmemAAddr = 0;
+            dmemAAddr = 'hx;
 
             dmemAWe_orig = 0;
 
-            dmemAIn = 0;
+            dmemAIn = 'hx;
 
-            uaddA = 0;
+            uaddA = 'hx;
 
-            uaddB = 0;
+            uaddB = 'hx;
 
-            nextHi = 0;
+            nextHi = hi;
 
-            nextLo = 0;
+            nextLo = lo;
 
-            extend8UIn = 0;
+            extend8UIn = 'hx;
 
-            extend8SIn = 0;
+            extend8SIn = 'hx;
 
-            extend16S_2In = 0;
+            extend16S_2In = 'hx;
 
             cp0Exception = 0;
 
             cp0Cause = 0;
 
-            cp0Addr = 0;
+            cp0Addr = 'hx;
 
             trap = 0;
+
+            cp0WData = 'hx;
 
             nextPC = 32'hABABABAB;
         end
@@ -430,7 +440,7 @@ module nyarlathotep(
     
     Trapezohedron cp0(
         .clk(clk),
-        .rst(rst),
+        .rst(reset),
         .mfc0(iMfc0),
         .mtc0(iMtc0),
         .pc(pc),

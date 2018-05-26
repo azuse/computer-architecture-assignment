@@ -68,8 +68,6 @@ module computer_tb(
         instPrev <= inst;
         pcPrev <= pc;
         if (cpuRunning) begin
-            if(inst[0] === 1'bx)
-                cpuEna_n <= 1'b1;
             if(cpuDonotRecordFirst) begin
                 $fdisplay(file_output,"pc: %h", pcPrev - 32'h00400000);
                 $fdisplay(file_output,"instr: %h", instPrev);

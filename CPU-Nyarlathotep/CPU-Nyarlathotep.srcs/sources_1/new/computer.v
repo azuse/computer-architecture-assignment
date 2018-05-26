@@ -13,7 +13,7 @@ module computer(
     
     //////////////////
     /// Frequency divider
-    cpu_div #(4) cpu_clk(clk_in, reset, clk);
+    cpu_div #(4) cpu_clk(clk_in, clk);
     assign clk_afterDiv = clk;
 
     ////////////////
@@ -71,7 +71,7 @@ module computer(
 
     //////////////
     /// CPU Instantiation
-    nyarlathotep cpu(
+    nyarlathotep sccpu(
         .clk(clk),
         .reset(reset),
         .ena(cpuEna),
