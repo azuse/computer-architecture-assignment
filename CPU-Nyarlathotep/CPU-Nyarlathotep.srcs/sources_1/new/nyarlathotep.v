@@ -211,8 +211,8 @@ module nyarlathotep(
         if(op == 6'b000000 && rd == 5'h0 && rt == 5'h0 && func == 6'b010001) iMthi = 1; else iMthi = 0;
         if(op == 6'b000000 && rd == 5'h0 && rt == 5'h0 && func == 6'b010011) iMtlo = 1; else iMtlo = 0;
 
-        if(op == 6'b010000 && func == 6'b000000) iMfc0 = 1; else iMfc0 = 0;
-        if(op == 6'b010000 && rs == 5'b00100 && func == 6'b000000) iMtc0 = 1; else iMtc0 = 0;
+        if(op == 6'b010000 && rs == 5'b00000 && inst[10:3] == 8'h00) iMfc0 = 1; else iMfc0 = 0;
+        if(op == 6'b010000 && rs == 5'b00100 && inst[10:3] == 8'h00) iMtc0 = 1; else iMtc0 = 0;
 
         if(op == 6'b011100 && func == 6'b100000) iClz = 1; else iClz = 0;
         if(op == 6'b000000 && func == 6'b110100) iTeq = 1; else iTeq = 0;
@@ -309,129 +309,590 @@ module nyarlathotep(
     localparam BigEndianCPU = 1'b0;
 
     always @(*) begin
-        if (cpuRunning) begin
-            
+        trap = 0;
 
-            rfRAddr1 = rs;
-            rfRAddr2 = rt;
+        cp0Exception = `DISABLE;
+        cp0Addr = 32'h0;
+        cp0WData = 32'h0;
+        cp0Cause = 32'h0;
 
-            aluA = ((((iAdd | iAddu | iSub | iSubu) | (iAnd | iOr | iXor | iNor)) | ((iSlt | iSltu | iAddi) | (iAddiu | iAndi))) | (iOri | iXori | iLw | iSw | iBeq | iBne | iSlti | iSltiu | iDiv | iDivu | iMult | iMul | iMultu | iClz | iTeq)) ? rfRData1 : (iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iSb | iSh) ? rfRData2 : 32'h0;
-            
-            aluModeSel = (iAdd | iAddi) ? ALU_SADD : (iAddu | iAddiu | iLw | iSw) ? ALU_UADD: (iSub) ? ALU_SSUB : (iSubu) ? ALU_USUB : (iAnd | iAndi) ? ALU_AND : (iOr | iOri) ? ALU_OR : (iXor | iXori) ? ALU_XOR : (iNor) ? ALU_NOR : (iSlt | iSlti) ? ALU_SLES : (iSltu | iSltiu) ? ALU_ULES : (iSll | iSb | iSh) ? ALU_SL : (iSrl | iSrlv) ? ALU_SRL : (iSra | iSrav) ? ALU_SRA : (iAdd | iAddi) ? ALU_SADD : (iBeq | iBne | iTeq) ? ALU_EQU : (iDiv) ? ALU_SDIV : (iDivu) ? ALU_UDIV : (iMult | iMul) ? ALU_SMUL : (iMultu) ? ALU_UMUL : (iClz) ? ALU_CLZ : 5'h00;
+        extend16S_1In = 32'hxxxxxxxx;
+        extend16S_2In = 32'hxxxxxxxx;
+        extend16UIn = 32'hxxxxxxxx;
+        extend8SIn = 32'hxxxxxxxx;
+        extend8UIn = 32'hxxxxxxxx;
+        
 
-            rfWe = ((iAdd | iSub) & (aluOverflow ? `DISABLE : `ENABLE)) | ((iAddu | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSlti | iSltiu | iLui | iJal | iMul | iJalr | iLbu | iLhu | iLb | iLh | iMfhi | iMflo | iMfc0 | iClz) & (`ENABLE));
+        dmemAWe_orig = 4'h0;
+        dmemAEn = 1'b0;
+        dmemAIn = 32'haaaaaaaa;
+        dmemAAddr = initDataAddr;
 
-            rfWAddr = ((iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iMul | iJalr | iMfhi | iMflo | iClz) ? rd : 5'h0) | ((iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSlti | iSltiu | iLui | iLbu | iLhu | iLb | iLh | iMfc0) ? rt : 5'h0) | ((iJal) ? 5'd31 : 5'h0);
+        rfRAddr1 = 32'hxxxxxxxx;
+        rfRAddr2 = 32'hxxxxxxxx;
 
-            rfWData = (iLw) ? dmemAOut : (iLui) ? {imm, 16'h0} : (iJal | iJalr) ? pcPlus4 : (iLbu) ? extend8UOut : (iLhu) ? extend16UOut : (iLb) ? extend8SOut : (iLh) ? extend16S_2Out : (iMfhi) ? hi : (iMflo) ? lo : (iMfc0) ? cp0RData : aluR;
+        bytePos = 5'bxxxxx;
 
-            extend16S_1In = imm;
+        aluA = 32'hxxxxxxxx;
+        aluB = 32'hxxxxxxxx;
+        aluModeSel = ALU_AND;
 
-            
+        rfWe = 1'b0;
+        rfWAddr = 32'hxxxxxxxx;
+        rfWData = 32'hxxxxxxxx;
 
-            dmemAEn = ((iLw | iSw | iLbu | iLhu | iLb | iLh | iSb | iSh) & `ENABLE);
+        nextHi = hi;
+        nextLo = lo;
+        
+        uaddA = 32'hxxxxxxxx;
+        uaddB = 32'hxxxxxxxx;
 
-            dmemAAddr = ((iLw | iSw) ? aluR : uaddR);
-            
-            bytePos = (iLbu | iLb | iSb) ? {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}} : (iLhu | iLh | iSh) ? {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0} : 5'h00;
+        nextPC = pcPlus4;
+        
+        if(cpuRunning) begin
+            if(iAdd) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SADD;
 
-            extend16UIn = ((iAndi | iOri | iXori) ? imm : 16'h0) | ((iLhu) ? dmemAOut[8 * bytePos +: 16] : 16'h0);
-            
-            aluB = (iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iBeq | iBne | iDiv | iDivu | iMult | iMul | iMultu | iTeq) ? rfRData2 :
-            (iSll | iSrl | iSra) ? shamt : 
-            (iSllv | iSrlv | iSrav) ? rfRData1 : 
-            (iAddi | iAddiu | iLw | iSw | iSlti | iSltiu) ? extend16S_1Out :
-            (iAndi | iOri | iXori) ? extend16UOut :
-            (iSb) ? (bytePos[1:0] << 3) :
-            (iSh) ? (bytePos[1] ? 16 : 0) : 0;
-            
-            
+                rfWe = aluOverflow ? 1'b0 : 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iAddu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_UADD;
 
-            dmemAWe_orig = (iSw) ? 4'hf : (iSb) ? {(bytePos[1:0] == 2'h3), (bytePos[1:0] == 2'h2), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0)} : (iSh) ? {(bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0), (bytePos[1:0] == 2'h0)} : 4'h0;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSub) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SSUB;
 
-            dmemAIn = iSw ? rfRData2 : (iSb | iSh) ? aluR : 32'h0;
+                rfWe = aluOverflow ? 1'b0 : 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSubu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_USUB;
 
-            uaddA = (iBeq | iBne | iBgez) ? pcPlus4 : (iLbu | iLhu | iLb | iLh | iSb | iSh) ? extend16S_1Out : 32'h0;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iAnd) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_AND;
 
-            uaddB = (iBeq | iBne | iBgez) ? (extend16S_1Out << 2) : rfRData1;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iOr) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_OR;
 
-            nextHi = ((iDiv | iDivu | iMult | iMultu) ? aluRX : iMthi ? rfRData1 : hi);
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iXor) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_XOR;
 
-            nextLo = ((iDiv | iDivu | iMult | iMultu) ? aluR : iMtlo ? rfRData1 : lo);
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iNor) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_NOR;
 
-            extend8UIn = dmemAOut[8 * bytePos +: 8];
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSlt) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SLES;
 
-            extend8SIn = dmemAOut[8 * bytePos +: 8];
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSltu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_ULES;
 
-            extend16S_2In = dmemAOut[8 * bytePos +: 16];
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSll) begin
+                rfRAddr1 = rt;
+                rfRAddr2 = 0;
 
-            cp0Exception = ((iBreak | iSyscall | (iTeq & aluR[0])) & `ENABLE);
+                aluA = rfRData1;
+                aluB = shamt;
+                aluModeSel = ALU_SL;
 
-            cp0Cause = iBreak ? {25'h0, `BREAKCAUSE, 2'h0} : iSyscall ? {25'h0, `SYSCALLCAUSE, 2'h0} : (iTeq & aluR[0]) ? {25'h0, `TEQCAUSE, 2'h0} : 32'h0;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSrl) begin
+                rfRAddr1 = rt;
+                rfRAddr2 = 0;
+                aluA = rfRData1;
+                aluB = shamt;
+                aluModeSel = ALU_SRL;
 
-            cp0Addr = rd;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSra) begin
+                rfRAddr1 = rt;
+                rfRAddr2 = 0;
+                aluA = rfRData1;
+                aluB = shamt;
+                aluModeSel = ALU_SRA;
 
-            nextPC = (iJr | iJalr) ? rfRData1 : (iBeq) ? (aluR[0] ? uaddR : pcPlus4) : (iBne) ? (aluR[0] ? pcPlus4 : uaddR) : (iJ | iJal) ? {pc[31:28], index, 2'b0} : (iBgez) ? (rfRData1[31] ? pcPlus4 : uaddR) : (iBreak | iSyscall | iTeq) ? (exceptionEntry) : (iEret) ? (cp0ExecAddr) : pcPlus4;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSllv) begin
+                rfRAddr1 = rt;
+                rfRAddr2 = rs;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SL;
 
-            trap = (iTeq & aluR[0]);
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSrlv) begin
+                rfRAddr1 = rt;
+                rfRAddr2 = rs;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SRL;
 
-            cp0WData = rfRData1;
-        end else begin
-            bytePos = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iSrav) begin
+                rfRAddr1 = rt;
+                rfRAddr2 = rs;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SRA;
 
-            rfRAddr1 = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iJr) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                aluA = 0;
+                aluB = 0;
+                aluModeSel = ALU_AND;
+                nextPC = rfRData1;
+            end else if (iAddi) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = extend16S_1Out;
+                aluModeSel = ALU_SADD;
 
-            rfRAddr2 = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iAddiu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = extend16S_1Out;
+                aluModeSel = ALU_UADD;
 
-            aluA = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iAndi) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16UIn = imm;
 
-            aluB = 'hx;
+                aluA = rfRData1;
+                aluB = extend16UOut;
+                aluModeSel = ALU_AND;
 
-            aluModeSel = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iOri) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16UIn = imm;
 
-            rfWe = 0;
+                aluA = rfRData1;
+                aluB = extend16UOut;
+                aluModeSel = ALU_OR;
 
-            rfWAddr = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iXori) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16UIn = imm;
 
-            rfWData = 'hx;
+                aluA = rfRData1;
+                aluB = extend16UOut;
+                aluModeSel = ALU_XOR;
 
-            extend16S_1In = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iLw) begin
+                rfRAddr1 = base;
+                rfRAddr2 = 0;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = extend16S_1Out;
+                aluModeSel = ALU_UADD;
 
-            extend16UIn = 'hx;
+                dmemAEn = 1'b1;
+                dmemAAddr = aluR;
 
-            dmemAEn = 0;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = dmemAOut;
+            end else if (iSw) begin
+                rfRAddr1 = base;
+                rfRAddr2 = rt;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = extend16S_1Out;
+                aluModeSel = ALU_UADD;
 
-            dmemAAddr = 'hx;
+                dmemAEn = 1'b1;
+                dmemAWe_orig = 4'hf;
+                dmemAAddr = aluR;
+                dmemAIn = rfRData2;
+            end else if (iBeq || iBne) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_EQU;
 
-            dmemAWe_orig = 0;
+                uaddA = pcPlus4;
+                uaddB = extend16S_1Out << 2;
+                if (iBeq)
+                    nextPC = aluR[0] ? uaddR : pcPlus4;
+                else if (iBne)
+                    nextPC = aluR[0] ? pcPlus4 : uaddR;
+            end else if (iSlti) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = extend16S_1Out;
+                aluModeSel = ALU_SLES;
 
-            dmemAIn = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iSltiu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = 0;
+                extend16S_1In = imm;
+                aluA = rfRData1;
+                aluB = extend16S_1Out;
+                aluModeSel = ALU_ULES;
 
-            uaddA = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = aluR;
+            end else if (iLui) begin
+                rfRAddr1 = 0;
+                rfRAddr2 = 0;
 
-            uaddB = 'hx;
+                rfWe = 1'b1;
+                rfWAddr = rt;
+                rfWData = {imm, 16'h0};
+            end else if (iJ) begin
+                rfWe = 1'b0;   // Do nothing
+                nextPC = {pc[31:28], index, 2'b0};
+            end else if (iJal) begin
+                rfWe = 1'b1;
+                rfWAddr = 31;
+                rfWData = pcPlus4;
+                nextPC = {pc[31:28], index, 2'b0};
+            end else if (iDiv) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SDIV;
+                
+                nextHi = aluRX;
+                nextLo = aluR;
+            end else if (iDivu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_UDIV;
+                
+                nextHi = aluRX;
+                nextLo = aluR;
+            end else if (iMult) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SMUL;
+                
+                nextHi = aluRX;
+                nextLo = aluR;
+            end else if (iMul) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_SMUL;
+                
+                rfWData = aluR;
+                rfWAddr = rd;
+                rfWe = 1;
+                
+            end else if (iMultu) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_UMUL;
+                
+                nextHi = aluRX;
+                nextLo = aluR;
+            end else if (iBgez) begin
+                rfRAddr1 = rs;
+                extend16S_1In = imm;
+                
+                uaddA = pcPlus4;
+                uaddB = extend16S_1Out << 2;
+                nextPC = rfRData1[31] ? pcPlus4 : uaddR;
+            end else if (iJalr) begin
+                rfRAddr1 = rs;
+                rfWe = 1'b1;
+                rfWAddr = rd;
+                rfWData = pcPlus4;
+                nextPC = rfRData1;
+            end else if (iLbu) begin
+                rfRAddr1 = base;
+                rfWAddr = rt;
+                rfWe = 1'b1;
 
-            nextHi = hi;
+                extend16S_1In = imm;
+                
+                uaddA = extend16S_1Out;
+                uaddB = rfRData1;
 
-            nextLo = lo;
+                dmemAAddr = uaddR;
+                dmemAEn = 1'b1;
 
-            extend8UIn = 'hx;
+                bytePos = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
 
-            extend8SIn = 'hx;
+                extend8UIn = dmemAOut[8 * bytePos +: 8];
 
-            extend16S_2In = 'hx;
+                rfWData = extend8UOut;
+            end else if (iLhu) begin
+                rfRAddr1 = base;
+                rfWAddr = rt;
+                rfWe = 1'b1;
 
-            cp0Exception = 0;
+                extend16S_1In = imm;
 
-            cp0Cause = 0;
+                uaddA = extend16S_1Out;
+                uaddB = rfRData1;
 
-            cp0Addr = 'hx;
+                dmemAAddr = uaddR;
+                dmemAEn = 1'b1;
 
-            trap = 0;
+                //bytePos = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+                bytePos = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
 
-            cp0WData = 'hx;
+                extend16UIn = dmemAOut[8 * bytePos +: 16];
 
-            nextPC = 32'hABABABAB;
+                rfWData = extend16UOut;
+            end else if (iLb) begin
+                rfRAddr1 = base;
+                rfWAddr = rt;
+                rfWe = 1'b1;
+
+                extend16S_1In = imm;
+                
+                uaddA = extend16S_1Out;
+                uaddB = rfRData1;
+
+                dmemAAddr = uaddR;
+                dmemAEn = 1'b1;
+
+                bytePos = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}};
+
+                extend8SIn = dmemAOut[8 * bytePos +: 8];
+
+                rfWData = extend8SOut;
+            end else if (iLh) begin
+                rfRAddr1 = base;
+                rfWAddr = rt;
+                rfWe = 1'b1;
+
+                extend16S_1In = imm;
+                
+                uaddA = extend16S_1Out;
+                uaddB = rfRData1;
+
+                dmemAAddr = uaddR;
+                dmemAEn = 1'b1;
+
+                //bytePos = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+                bytePos = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+
+                extend16S_2In = dmemAOut[8 * bytePos +: 16];
+
+                rfWData = extend16S_2Out;
+            end else if (iSb) begin
+                rfRAddr1 = base;
+                rfRAddr2 = rt;
+
+                extend16S_1In = imm;
+                
+                uaddA = extend16S_1Out;
+                uaddB = rfRData1;
+
+                dmemAEn = 1'b1;
+                dmemAAddr = uaddR;
+
+                bytePos = {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}} };
+
+                dmemAWe_orig[0] = (bytePos[1:0] == 2'h0);
+                dmemAWe_orig[1] = (bytePos[1:0] == 2'h1);
+                dmemAWe_orig[2] = (bytePos[1:0] == 2'h2);
+                dmemAWe_orig[3] = (bytePos[1:0] == 2'h3);
+
+                aluA = rfRData2;
+                aluB = bytePos[1:0] << 3;
+                aluModeSel = ALU_SL;
+                
+                dmemAIn = aluR;
+            end else if (iSh) begin
+                rfRAddr1 = base;
+                rfRAddr2 = rt;
+
+                extend16S_1In = imm;
+                
+                uaddA = extend16S_1Out;
+                uaddB = rfRData1;
+
+                dmemAAddr = uaddR;
+
+                //bytePos = {3'b000, dmemAAddr[1:0] ^ {BigEndianCPU, 1'b0}};
+                bytePos = {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0};
+
+                dmemAEn = 1'b1;
+                dmemAWe_orig[0] = (bytePos[1] == 2'h0);
+                dmemAWe_orig[1] = (bytePos[1] == 2'h0);
+                dmemAWe_orig[2] = (bytePos[1] == 2'h1);
+                dmemAWe_orig[3] = (bytePos[1] == 2'h1);
+
+                aluA = rfRData2;
+                aluB = bytePos[1] ? 16 : 0;
+                aluModeSel = ALU_SL;
+                
+                dmemAIn = aluR;
+            end else if (iBreak) begin
+                cp0Exception = `ENABLE;
+                cp0Cause = {25'h0, `BREAKCAUSE, 2'h0};
+                nextPC = exceptionEntry;
+            end else if (iSyscall) begin
+                cp0Exception = `ENABLE;
+                cp0Cause = {25'h0, `SYSCALLCAUSE, 2'h0};
+                nextPC = exceptionEntry;
+            end else if (iEret) begin
+                nextPC = cp0ExecAddr;
+            end else if (iMfhi) begin
+                rfWAddr = rd;
+                rfWe = 1'b1;
+                rfWData = hi;
+            end else if (iMflo) begin
+                rfWAddr = rd;
+                rfWe = 1'b1;
+                rfWData = lo;
+            end else if (iMthi) begin
+                rfRAddr1 = rs;
+                nextHi = rfRData1;
+            end else if (iMtlo) begin
+                rfRAddr1 = rs;
+                nextLo = rfRData1;
+            end else if (iMfc0) begin
+                cp0Addr = rd;
+                rfWe = `ENABLE;
+                rfWAddr = rt;
+                rfWData = cp0RData;
+            end else if (iMtc0) begin
+                rfRAddr1 = rt;
+                cp0Addr = rd;
+                cp0WData = rfRData1;
+            end else if (iClz) begin
+                rfRAddr1 = rs;
+                aluA = rfRData1;
+                aluB = 0;
+                aluModeSel = ALU_CLZ;
+
+                rfWe = 1;
+                rfWAddr = rd;
+                rfWData = aluR;
+            end else if (iTeq) begin
+                rfRAddr1 = rs;
+                rfRAddr2 = rt;
+
+                aluA = rfRData1;
+                aluB = rfRData2;
+                aluModeSel = ALU_EQU;
+
+                if(aluR[0]) begin
+                    cp0Cause = {25'h0, `TEQCAUSE, 2'h0};
+                    cp0Exception = `ENABLE;
+                end
+                trap = aluR[0];
+                nextPC = exceptionEntry;
+            end
         end
     end
 
@@ -443,7 +904,7 @@ module nyarlathotep(
         .rst(reset),
         .mfc0(iMfc0),
         .mtc0(iMtc0),
-        .pc(pc),
+        .pc(pcPlus4),
         .addr(cp0Addr),
         .data(cp0WData),
         .exception(cp0Exception),

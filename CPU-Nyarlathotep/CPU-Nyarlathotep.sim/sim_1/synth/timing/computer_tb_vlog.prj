@@ -1,0 +1,6 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  "computer_tb_time_synth.v" --include "../../../../CPU-Nyarlathotep.srcs/sources_1/new"
+verilog xil_defaultlib  "../../../../CPU-Nyarlathotep.srcs/sim_1/new/computer_tb.v" --include "../../../../CPU-Nyarlathotep.srcs/sources_1/new"
+
+# Do not sort compile order
+nosort

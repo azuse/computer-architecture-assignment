@@ -12,8 +12,8 @@ module MULT (
 );
 
 reg lastEna;
-reg [3:0] counter;
-localparam COUNTER_CYCLE = 15;
+(* dont_touch = "yes" *) reg [7:0] counter;
+localparam COUNTER_CYCLE = 25;
 
 always @(posedge clk) begin
     // negedge of main clk

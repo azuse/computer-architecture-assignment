@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="D:/Projects/CompArch/CPU-Nyarlathotep/CPU-Nyarlathotep.sim/sim_1/synth/timing/computer_tb_time_synth.wdb" id="1">
+         <top_modules>
+            <top_module name="computer_tb" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="28503850000fs"></ZoomStartTime>
+      <ZoomEndTime time="28946350001fs"></ZoomEndTime>
+      <Cursor1Time time="28572350000fs"></Cursor1Time>
+   </zoom_setting>
+   <WVObjectSize size="40" />
+   <wvobject fp_name="/computer_tb/clk_in" type="logic">
+      <obj_property name="ElementShortName">clk_in</obj_property>
+      <obj_property name="ObjectShortName">clk_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/clk_div" type="logic">
+      <obj_property name="ElementShortName">clk_div</obj_property>
+      <obj_property name="ObjectShortName">clk_div</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/inst" type="array">
+      <obj_property name="ElementShortName">inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/addr" type="array">
+      <obj_property name="ElementShortName">addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/cpuRunning" type="logic">
+      <obj_property name="ElementShortName">cpuRunning</obj_property>
+      <obj_property name="ObjectShortName">cpuRunning</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/cpuEna" type="logic">
+      <obj_property name="ElementShortName">cpuEna</obj_property>
+      <obj_property name="ObjectShortName">cpuEna</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[0]_0 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[0]_0 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[0]_0 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[1]_1 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[1]_1 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[1]_1 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[2]_2 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[2]_2 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[2]_2 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[3]_3 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[3]_3 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[3]_3 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[4]_4 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[4]_4 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[4]_4 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[5]_5 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[5]_5 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[5]_5 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[6]_6 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[6]_6 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[6]_6 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[7]_7 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[7]_7 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[7]_7 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[8]_8 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[8]_8 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[8]_8 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[9]_9 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[9]_9 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[9]_9 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[10]_10 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[10]_10 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[10]_10 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[11]_11 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[11]_11 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[11]_11 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[12]_12 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[12]_12 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[12]_12 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[13]_13 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[13]_13 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[13]_13 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[14]_14 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[14]_14 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[14]_14 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[15]_15 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[15]_15 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[15]_15 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[16]_16 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[16]_16 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[16]_16 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[17]_17 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[17]_17 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[17]_17 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[18]_18 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[18]_18 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[18]_18 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[19]_19 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[19]_19 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[19]_19 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[20]_20 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[20]_20 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[20]_20 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[21]_21 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[21]_21 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[21]_21 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[22]_22 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[22]_22 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[22]_22 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[23]_23 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[23]_23 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[23]_23 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[24]_24 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[24]_24 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[24]_24 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[25]_25 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[25]_25 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[25]_25 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[26]_26 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[26]_26 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[26]_26 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[27]_27 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[27]_27 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[27]_27 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[28]_28 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[28]_28 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[28]_28 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[29]_29 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[29]_29 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[29]_29 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[30]_30 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[30]_30 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[30]_30 [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/\array_reg_reg[31]_31 " type="array">
+      <obj_property name="ElementShortName">\array_reg_reg[31]_31 [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\array_reg_reg[31]_31 [31:0]</obj_property>
+   </wvobject>
+</wave_config>

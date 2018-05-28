@@ -45,8 +45,8 @@ module ALU(
 
     assign busy = multBusy | divBusy | clzBusy;
 
-    CLZAlgorithm_empty clzblock (A, (modeSel == ALU_CLZ), clzResult, clzBusy);
-    MULT_empty multiplier (
+    CLZAlgorithm clzblock (clk, A, (modeSel == ALU_CLZ), clzResult, clzBusy);
+    MULT multiplier (
         .clk(clk),
         .ena(modeSel == ALU_SMUL || modeSel == ALU_UMUL),
         .isUnsigned(opIsUnsigned),
@@ -56,7 +56,7 @@ module ALU(
         .carry(multCarry),
         .busy(multBusy)
     );
-    DIV_empty divider (
+    DIV divider (
         .clk(clk),
         .ena(modeSel == ALU_SDIV || modeSel == ALU_UDIV),
         .dividend(A),

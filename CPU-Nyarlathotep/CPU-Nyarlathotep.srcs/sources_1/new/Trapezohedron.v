@@ -59,17 +59,17 @@ module Trapezohedron(
         end else if(eret) begin
             status_reg <= status_reg >> 5;
         end else if (exception && interruptEna) begin
-            if(excCode == 'b01000 && syscallMask) begin
+            if((excCode == 'b01000) && syscallMask) begin
                 // Syscall
                 cause_reg[6:2] <= excCode;
                 status_reg <= status_reg << 5;
                 epc_reg <= pc;
-            end else if(excCode == 'b01001 && breakMask) begin
+            end else if((excCode == 'b01001) && breakMask) begin
                 // Break
                 cause_reg[6:2] <= excCode;
                 status_reg <= status_reg << 5;
                 epc_reg <= pc;
-            end else if(excCode == 'b01101 && teqMask) begin
+            end else if((excCode == 'b01101) && teqMask) begin
                 // Teq
                 cause_reg[6:2] <= excCode;
                 status_reg <= status_reg << 5;

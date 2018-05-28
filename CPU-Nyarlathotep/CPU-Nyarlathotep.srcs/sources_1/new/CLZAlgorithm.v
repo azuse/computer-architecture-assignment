@@ -1,12 +1,13 @@
 module CLZAlgorithm(
+    input clk,
     input [31:0] A,
     input ena,
     output [5:0] R,  //Max: 32, 6 bits
     output busy
 );
     reg lastEna;
-    reg [3:0] counter;
-    localparam COUNTER_CYCLE = 4;
+    (* dont_touch = "yes" *) reg [7:0] counter;
+    localparam COUNTER_CYCLE = 25;
 
     always @(posedge clk) begin
         // negedge of main clk

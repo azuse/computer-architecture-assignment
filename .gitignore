@@ -3,6 +3,7 @@
 **/*.runs/
 **/*.sim/sim_*/behav/
 **/vivado*.jou
+**/*.wdb
 **/vivado*.log
 **/~$*.do[ct]
 **/~$*.do[ct]?

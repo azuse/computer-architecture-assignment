@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="computer_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="computer_tb" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="48377000000fs"></ZoomStartTime>
+      <ZoomEndTime time="49781000001fs"></ZoomEndTime>
+      <Cursor1Time time="49053000000fs"></Cursor1Time>
+   </zoom_setting>
+   <WVObjectSize size="80" />
+   <wvobject fp_name="/computer_tb/clk_in" type="logic">
+      <obj_property name="ElementShortName">clk_in</obj_property>
+      <obj_property name="ObjectShortName">clk_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/clk_div" type="logic">
+      <obj_property name="ElementShortName">clk_div</obj_property>
+      <obj_property name="ObjectShortName">clk_div</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/inst" type="array">
+      <obj_property name="ElementShortName">inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/addr" type="array">
+      <obj_property name="ElementShortName">addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/instPrev" type="array">
+      <obj_property name="ElementShortName">instPrev[31:0]</obj_property>
+      <obj_property name="ObjectShortName">instPrev[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/pcPrev" type="array">
+      <obj_property name="ElementShortName">pcPrev[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcPrev[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/cpuRunning" type="logic">
+      <obj_property name="ElementShortName">cpuRunning</obj_property>
+      <obj_property name="ObjectShortName">cpuRunning</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/file_output" type="array">
+      <obj_property name="ElementShortName">file_output[31:0]</obj_property>
+      <obj_property name="ObjectShortName">file_output[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/cpuEna" type="logic">
+      <obj_property name="ElementShortName">cpuEna</obj_property>
+      <obj_property name="ObjectShortName">cpuEna</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/cpuDonotRecordFirst" type="logic">
+      <obj_property name="ElementShortName">cpuDonotRecordFirst</obj_property>
+      <obj_property name="ObjectShortName">cpuDonotRecordFirst</obj_property>
+   </wvobject>
+   <wvobject fp_name="group97" type="group">
+      <obj_property name="label">ALU</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="vbus99" type="vbus">
+         <obj_property name="label">ALUR</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/eret" type="logic">
+      <obj_property name="ElementShortName">eret</obj_property>
+      <obj_property name="ObjectShortName">eret</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/exception" type="logic">
+      <obj_property name="ElementShortName">exception</obj_property>
+      <obj_property name="ObjectShortName">exception</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/epc_out" type="array">
+      <obj_property name="ElementShortName">epc_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">epc_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/cause" type="array">
+      <obj_property name="ElementShortName">cause[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cause[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/status_reg" type="array">
+      <obj_property name="ElementShortName">status_reg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">status_reg[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/breakMask" type="logic">
+      <obj_property name="ElementShortName">breakMask</obj_property>
+      <obj_property name="ObjectShortName">breakMask</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cp0/excCode" type="array">
+      <obj_property name="ElementShortName">excCode[4:0]</obj_property>
+      <obj_property name="ObjectShortName">excCode[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg" type="array">
+      <obj_property name="ElementShortName">array_reg[0:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">array_reg[0:31][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/rfRAddr1" type="array">
+      <obj_property name="ElementShortName">rfRAddr1[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rfRAddr1[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/rfRData1" type="array">
+      <obj_property name="ElementShortName">rfRData1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rfRData1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMtc0" type="logic">
+      <obj_property name="ElementShortName">iMtc0</obj_property>
+      <obj_property name="ObjectShortName">iMtc0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMul" type="logic">
+      <obj_property name="ElementShortName">iMul</obj_property>
+      <obj_property name="ObjectShortName">iMul</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iAdd" type="logic">
+      <obj_property name="ElementShortName">iAdd</obj_property>
+      <obj_property name="ObjectShortName">iAdd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iAddu" type="logic">
+      <obj_property name="ElementShortName">iAddu</obj_property>
+      <obj_property name="ObjectShortName">iAddu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSub" type="logic">
+      <obj_property name="ElementShortName">iSub</obj_property>
+      <obj_property name="ObjectShortName">iSub</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSubu" type="logic">
+      <obj_property name="ElementShortName">iSubu</obj_property>
+      <obj_property name="ObjectShortName">iSubu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iAnd" type="logic">
+      <obj_property name="ElementShortName">iAnd</obj_property>
+      <obj_property name="ObjectShortName">iAnd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iOr" type="logic">
+      <obj_property name="ElementShortName">iOr</obj_property>
+      <obj_property name="ObjectShortName">iOr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iXor" type="logic">
+      <obj_property name="ElementShortName">iXor</obj_property>
+      <obj_property name="ObjectShortName">iXor</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iNor" type="logic">
+      <obj_property name="ElementShortName">iNor</obj_property>
+      <obj_property name="ObjectShortName">iNor</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSlt" type="logic">
+      <obj_property name="ElementShortName">iSlt</obj_property>
+      <obj_property name="ObjectShortName">iSlt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSltu" type="logic">
+      <obj_property name="ElementShortName">iSltu</obj_property>
+      <obj_property name="ObjectShortName">iSltu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSll" type="logic">
+      <obj_property name="ElementShortName">iSll</obj_property>
+      <obj_property name="ObjectShortName">iSll</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSrl" type="logic">
+      <obj_property name="ElementShortName">iSrl</obj_property>
+      <obj_property name="ObjectShortName">iSrl</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSra" type="logic">
+      <obj_property name="ElementShortName">iSra</obj_property>
+      <obj_property name="ObjectShortName">iSra</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSllv" type="logic">
+      <obj_property name="ElementShortName">iSllv</obj_property>
+      <obj_property name="ObjectShortName">iSllv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSrlv" type="logic">
+      <obj_property name="ElementShortName">iSrlv</obj_property>
+      <obj_property name="ObjectShortName">iSrlv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSrav" type="logic">
+      <obj_property name="ElementShortName">iSrav</obj_property>
+      <obj_property name="ObjectShortName">iSrav</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iJr" type="logic">
+      <obj_property name="ElementShortName">iJr</obj_property>
+      <obj_property name="ObjectShortName">iJr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iAddi" type="logic">
+      <obj_property name="ElementShortName">iAddi</obj_property>
+      <obj_property name="ObjectShortName">iAddi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iAddiu" type="logic">
+      <obj_property name="ElementShortName">iAddiu</obj_property>
+      <obj_property name="ObjectShortName">iAddiu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iAndi" type="logic">
+      <obj_property name="ElementShortName">iAndi</obj_property>
+      <obj_property name="ObjectShortName">iAndi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iOri" type="logic">
+      <obj_property name="ElementShortName">iOri</obj_property>
+      <obj_property name="ObjectShortName">iOri</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iXori" type="logic">
+      <obj_property name="ElementShortName">iXori</obj_property>
+      <obj_property name="ObjectShortName">iXori</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iLw" type="logic">
+      <obj_property name="ElementShortName">iLw</obj_property>
+      <obj_property name="ObjectShortName">iLw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSw" type="logic">
+      <obj_property name="ElementShortName">iSw</obj_property>
+      <obj_property name="ObjectShortName">iSw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iBeq" type="logic">
+      <obj_property name="ElementShortName">iBeq</obj_property>
+      <obj_property name="ObjectShortName">iBeq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iBne" type="logic">
+      <obj_property name="ElementShortName">iBne</obj_property>
+      <obj_property name="ObjectShortName">iBne</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSlti" type="logic">
+      <obj_property name="ElementShortName">iSlti</obj_property>
+      <obj_property name="ObjectShortName">iSlti</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSltiu" type="logic">
+      <obj_property name="ElementShortName">iSltiu</obj_property>
+      <obj_property name="ObjectShortName">iSltiu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iLui" type="logic">
+      <obj_property name="ElementShortName">iLui</obj_property>
+      <obj_property name="ObjectShortName">iLui</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iJ" type="logic">
+      <obj_property name="ElementShortName">iJ</obj_property>
+      <obj_property name="ObjectShortName">iJ</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iJal" type="logic">
+      <obj_property name="ElementShortName">iJal</obj_property>
+      <obj_property name="ObjectShortName">iJal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iDiv" type="logic">
+      <obj_property name="ElementShortName">iDiv</obj_property>
+      <obj_property name="ObjectShortName">iDiv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iDivu" type="logic">
+      <obj_property name="ElementShortName">iDivu</obj_property>
+      <obj_property name="ObjectShortName">iDivu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMult" type="logic">
+      <obj_property name="ElementShortName">iMult</obj_property>
+      <obj_property name="ObjectShortName">iMult</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMultu" type="logic">
+      <obj_property name="ElementShortName">iMultu</obj_property>
+      <obj_property name="ObjectShortName">iMultu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iBgez" type="logic">
+      <obj_property name="ElementShortName">iBgez</obj_property>
+      <obj_property name="ObjectShortName">iBgez</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iJalr" type="logic">
+      <obj_property name="ElementShortName">iJalr</obj_property>
+      <obj_property name="ObjectShortName">iJalr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iLbu" type="logic">
+      <obj_property name="ElementShortName">iLbu</obj_property>
+      <obj_property name="ObjectShortName">iLbu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iLhu" type="logic">
+      <obj_property name="ElementShortName">iLhu</obj_property>
+      <obj_property name="ObjectShortName">iLhu</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iLb" type="logic">
+      <obj_property name="ElementShortName">iLb</obj_property>
+      <obj_property name="ObjectShortName">iLb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iLh" type="logic">
+      <obj_property name="ElementShortName">iLh</obj_property>
+      <obj_property name="ObjectShortName">iLh</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSb" type="logic">
+      <obj_property name="ElementShortName">iSb</obj_property>
+      <obj_property name="ObjectShortName">iSb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSh" type="logic">
+      <obj_property name="ElementShortName">iSh</obj_property>
+      <obj_property name="ObjectShortName">iSh</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iBreak" type="logic">
+      <obj_property name="ElementShortName">iBreak</obj_property>
+      <obj_property name="ObjectShortName">iBreak</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iSyscall" type="logic">
+      <obj_property name="ElementShortName">iSyscall</obj_property>
+      <obj_property name="ObjectShortName">iSyscall</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iEret" type="logic">
+      <obj_property name="ElementShortName">iEret</obj_property>
+      <obj_property name="ObjectShortName">iEret</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMfhi" type="logic">
+      <obj_property name="ElementShortName">iMfhi</obj_property>
+      <obj_property name="ObjectShortName">iMfhi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMflo" type="logic">
+      <obj_property name="ElementShortName">iMflo</obj_property>
+      <obj_property name="ObjectShortName">iMflo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMthi" type="logic">
+      <obj_property name="ElementShortName">iMthi</obj_property>
+      <obj_property name="ObjectShortName">iMthi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMtlo" type="logic">
+      <obj_property name="ElementShortName">iMtlo</obj_property>
+      <obj_property name="ObjectShortName">iMtlo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMfc0" type="logic">
+      <obj_property name="ElementShortName">iMfc0</obj_property>
+      <obj_property name="ObjectShortName">iMfc0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iMtc0" type="logic">
+      <obj_property name="ElementShortName">iMtc0</obj_property>
+      <obj_property name="ObjectShortName">iMtc0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iClz" type="logic">
+      <obj_property name="ElementShortName">iClz</obj_property>
+      <obj_property name="ObjectShortName">iClz</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iTeq" type="logic">
+      <obj_property name="ElementShortName">iTeq</obj_property>
+      <obj_property name="ObjectShortName">iTeq</obj_property>
+   </wvobject>
+</wave_config>
