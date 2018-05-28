@@ -23,7 +23,7 @@ module regfile #(
     assign rdata2 = array_reg[raddr2];
 
     integer j;
-    always @(posedge clk)
+    always @(posedge clk or posedge rst)
     begin
         if(rst) begin
             for(j = 0; j < num; j = j + 1)

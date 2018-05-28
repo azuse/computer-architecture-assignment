@@ -50,7 +50,7 @@ module nyarlathotep(
     wire [31:0] rfRData2;
 
     regfile cpu_ref(
-        .clk(clk),
+        .clk(~clk),
         .rst(reset),
         .we(rfWe),
         .cpuPaused(cpuPaused),
@@ -247,8 +247,9 @@ module nyarlathotep(
 
     localparam initInstAddr = 32'h00400000;
     localparam initDataAddr = 32'h10010000;
+    localparam exceptionEntry = 32'h00400004;
 
-    always @(posedge clk) begin
+    always @(posedge clk or posedge reset) begin
         if(reset == `ENABLE) begin
             startCounter <= 0;
             pc <= initInstAddr;
@@ -274,7 +275,8 @@ module nyarlathotep(
 
     always @(negedge clk) begin
         if(reset == `ENABLE) begin
-            cpuStarted <= `DISABLE;
+            // cpuStarted <= `DISABLE;
+            cpuStarted <= `ENABLE;
         end
         else
         begin
@@ -286,7 +288,7 @@ module nyarlathotep(
         end
     end
     
-    localparam exceptionEntry = 32'h00000004;
+    
 
 
     `define SYSCALLCAUSE  5'b01000
@@ -306,6 +308,7 @@ module nyarlathotep(
     reg trap;
     reg [3:0] dmemAWe_orig;
     assign dmemAWe = dmemAWe_orig & {4{cpuRunning & ~cpuPaused}};
+    wire [31:0] pc_out = pc;
     localparam BigEndianCPU = 1'b0;
 
     always @(*) begin

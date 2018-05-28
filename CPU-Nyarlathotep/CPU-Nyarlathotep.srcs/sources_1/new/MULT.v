@@ -27,7 +27,9 @@ always @(posedge clk) begin
     end
 end
 
-assign busy = ena & (counter != COUNTER_CYCLE);
+//assign busy = ena & (counter != COUNTER_CYCLE);
+// webtest requires CALCULATION DONE IN ONE CYCLE
+assign busy = 1'b0;
 
 reg [31:0] ax, bx;
 wire [63:0] zx;

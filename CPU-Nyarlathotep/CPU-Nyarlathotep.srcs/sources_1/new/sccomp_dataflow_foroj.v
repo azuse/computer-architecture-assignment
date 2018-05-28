@@ -1,20 +1,17 @@
-module computer(
+module sccomp_dataflow(
     input clk_in,
-    output clk_afterDiv,
     input reset,
-    input cpuEna,
     output [31:0] inst,
     output [31:0] pc,
-    output [31:0] addr,
-    output cpuRunning
+    output [31:0] addr
 );
-
-    wire clk;
-    
     //////////////////
     /// Frequency divider
-    cpu_div #(4) cpu_clk(clk_in, clk);
-    assign clk_afterDiv = clk;
+    //  We no longer need this in an webtest-oriented top module
+    // cpu_div #(4) cpu_clk(clk_in, clk);
+    // ADD
+    wire clk_afterDiv;
+    assign clk_afterDiv = clk_in;
 
     ////////////////
     /// DMEM
@@ -33,8 +30,8 @@ module computer(
     // DMEM
     assign addr = dmemAEn ? dmemAAddr : 32'hFFFFFFFF;
 
-    DMEM_my dmem (
-        .clka(~clk),    // input wire clka
+    DMEM_block dmem (
+        .clka(~clk_afterDiv),    // input wire clka
         .ena(dmemAEn),      // input wire ena
         .wea(dmemAWe),      // input wire [3 : 0] wea
         .addra(dmemARealAddr[11:2]),  // input wire [9 : 0] addra
@@ -72,9 +69,9 @@ module computer(
     //////////////
     /// CPU Instantiation
     nyarlathotep sccpu(
-        .clk(clk),
+        .clk(clk_afterDiv),
         .reset(reset),
-        .ena(cpuEna),
+        .ena(1'b1),
         .dmemAEn(dmemAEn),
         .dmemAWe(dmemAWe),
         .dmemAAddr(dmemAAddr),

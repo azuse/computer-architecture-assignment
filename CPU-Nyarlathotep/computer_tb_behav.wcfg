@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="computer_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="computer_tb" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="1534000001fs"></ZoomEndTime>
+      <Cursor1Time time="302000000fs"></Cursor1Time>
+   </zoom_setting>
+   <WVObjectSize size="24" />
+   <wvobject fp_name="/computer_tb/clk_in" type="logic">
+      <obj_property name="ElementShortName">clk_in</obj_property>
+      <obj_property name="ObjectShortName">clk_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/inst" type="array">
+      <obj_property name="ElementShortName">inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/addr" type="array">
+      <obj_property name="ElementShortName">addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/clk_afterDiv" type="logic">
+      <obj_property name="ElementShortName">clk_afterDiv</obj_property>
+      <obj_property name="ObjectShortName">clk_afterDiv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/dmemAAddr" type="array">
+      <obj_property name="ElementShortName">dmemAAddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dmemAAddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/imemRAddr" type="array">
+      <obj_property name="ElementShortName">imemRAddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imemRAddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/pcPlus4" type="array">
+      <obj_property name="ElementShortName">pcPlus4[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcPlus4[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/nextPC" type="array">
+      <obj_property name="ElementShortName">nextPC[31:0]</obj_property>
+      <obj_property name="ObjectShortName">nextPC[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg" type="array">
+      <obj_property name="ElementShortName">array_reg[0:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">array_reg[0:31][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iBeq" type="logic">
+      <obj_property name="ElementShortName">iBeq</obj_property>
+      <obj_property name="ObjectShortName">iBeq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/iBne" type="logic">
+      <obj_property name="ElementShortName">iBne</obj_property>
+      <obj_property name="ObjectShortName">iBne</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/aluR" type="array">
+      <obj_property name="ElementShortName">aluR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">aluR[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/uaddR" type="array">
+      <obj_property name="ElementShortName">uaddR[31:0]</obj_property>
+      <obj_property name="ObjectShortName">uaddR[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/aluA" type="array">
+      <obj_property name="ElementShortName">aluA[31:0]</obj_property>
+      <obj_property name="ObjectShortName">aluA[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/aluB" type="array">
+      <obj_property name="ElementShortName">aluB[31:0]</obj_property>
+      <obj_property name="ObjectShortName">aluB[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/aluBusy" type="logic">
+      <obj_property name="ElementShortName">aluBusy</obj_property>
+      <obj_property name="ObjectShortName">aluBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/rfRAddr1" type="array">
+      <obj_property name="ElementShortName">rfRAddr1[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rfRAddr1[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/rfRAddr2" type="array">
+      <obj_property name="ElementShortName">rfRAddr2[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rfRAddr2[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/rfRData1" type="array">
+      <obj_property name="ElementShortName">rfRData1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rfRData1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/computer_tb/uut/sccpu/rfRData2" type="array">
+      <obj_property name="ElementShortName">rfRData2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rfRData2[31:0]</obj_property>
+   </wvobject>
+</wave_config>

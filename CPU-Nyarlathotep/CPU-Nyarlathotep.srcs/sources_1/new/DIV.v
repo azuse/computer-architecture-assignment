@@ -27,7 +27,9 @@ module DIV(
         end
     end
 
-    assign busy = ena & (counter != COUNTER_CYCLE);
+    //assign busy = ena & (counter != COUNTER_CYCLE);
+    // webtest requires CALCULATION DONE IN ONE CYCLE
+    assign busy = 1'b0;
 
     //reg [32:0] r_dividend = 0;
     wire [32:0] r_dividend = {1'b0, isUnsigned ? dividend : dividend[31] ? -dividend : dividend};
