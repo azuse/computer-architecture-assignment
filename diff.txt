@@ -1,0 +1,934 @@
+diff --git "a/CPU-Nyarlathotep/1652270-\345\206\257\350\210\234-\350\256\241\347\273\20454\346\235\241\346\214\207\344\273\244CPU.zip" "b/CPU-Nyarlathotep/1652270-\345\206\257\350\210\234-\350\256\241\347\273\20454\346\235\241\346\214\207\344\273\244CPU.zip"
+new file mode 100644
+index 0000000..af31969
+Binary files /dev/null and "b/CPU-Nyarlathotep/1652270-\345\206\257\350\210\234-\350\256\241\347\273\20454\346\235\241\346\214\207\344\273\244CPU.zip" differ
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/ALU_tb.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/ALU_tb.v
+deleted file mode 100644
+index b2b8b3d..0000000
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/ALU_tb.v
++++ /dev/null
+@@ -1,234 +0,0 @@
+-`timescale 1ns / 1ns
+-
+-module ALU_tb(
+-
+-    );
+-    reg signed [31:0] A;
+-    reg [31:0] B;
+-    reg [4:0] modeSel;
+-
+-    wire [31:0] R;
+-    wire [31:0] RX;
+-    wire isRZero;
+-    wire isCarry;
+-    wire isRNegative;
+-    wire isOverflow;
+-
+-    `include "aluHeader.vh"
+-
+-    ALU uut(
+-        .A(A),
+-        .B(B),
+-        .modeSel(modeSel),
+-        .R(R),
+-        .RX(RX),
+-        .isRZero(isRZero),
+-        .isCarry(isCarry),
+-        .isRNegative(isRNegative),
+-        .isOverflow(isOverflow)
+-    );
+-
+-    integer i, f, tmp;
+-    integer seed;
+-    time signed li;    //Long Int
+-    time liu;
+-
+-    initial begin
+-        seed = 32'had0897;
+-        $urandom(seed);
+-
+-        f = $fopen("ALU_tb_output.txt", "w");
+-
+-        #5
+-        modeSel = ALU_AND;
+-        $fwrite(f, "Test: AND\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s\n", A, B, R, A&B, ((R==(A&B))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_XOR;
+-        $fwrite(f, "Test: XOR\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s\n", A, B, R, A^B, ((R==(A^B))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_OR;
+-        $fwrite(f, "Test: OR\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s\n", A, B, R, A|B, ((R==(A|B))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_NOR;
+-        $fwrite(f, "Test: NOR\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s\n", A, B, R, ~(A|B), ((R==(~(A|B)))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_SL;
+-        $fwrite(f, "Test: Shift Left\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom_range(31,0);
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, RX: %b, Correct: %b, %s\n", A, B, R, RX, A<<B, ((R==(A<<B))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_SRL;
+-        $fwrite(f, "Test: Shift Right Logically\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom_range(31,0);
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, RX: %b, Correct: %b, %s\n", A, B, R, RX, A>>B, ((R==(A>>B))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_SRA;
+-        $fwrite(f, "Test: Shift Right Arithmetically\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom_range(31,0);
+-            #1 $fwrite(f, "A: %b, B: %b, R: %b, RX: %b, Correct: %b, %s\n", A, B, R, RX, A>>>B, (($signed(R)==(A>>>B))?"RIGHT":"WRONG"));
+-        end
+-
+-        #5
+-        modeSel = ALU_EQU;
+-        $fwrite(f, "Test: Equal\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            tmp = $urandom_range(1,0);
+-            A = $urandom;
+-            B = (tmp) ? A : $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, A==B, ((R==(A==B))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        A = 32'h0000000;
+-        modeSel = ALU_CLZ;
+-        $fwrite(f, "Test: CLZ\n");
+-        #20
+-        #10
+-        for (i = 0; i <= 32; i = i+1) begin
+-            $fwrite(f, "A: %b, Leading Zeros: %d, ZCNO: %1b%1b%1b%1b\n", A, R, isRZero, isCarry, isRNegative, isOverflow);
+-            if(A == 0)
+-                A = 32'h1;
+-            else
+-                A = A << 1;
+-            #10
+-            ;
+-        end
+-
+-        #5
+-        modeSel = ALU_SMUL;
+-        $fwrite(f, "Test: Signed Multiply\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            li = $signed(A);
+-            li = li * $signed(B);
+-            #5 $fwrite(f, "A: %h, B: %h, RX R: %h %h, Correct: %h %h, %s, ZCNO: %1b%1b%1b%1b\n", A, B, RX, R, li[63:32], li[31:0], (({RX,R}==$unsigned(li))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_SDIV;
+-        $fwrite(f, "Test: Signed Division\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            tmp = $urandom_range(15,0);
+-            B = $signed(B) >>> tmp;
+-            #5 $fwrite(f, "A: %h, B: %h, R: %h, RX: %h, Correct: %h %h, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, RX, $signed(A) / $signed(B), $signed(A) % $signed(B), (($signed(R)==($signed(A) / $signed(B)) && ($signed(RX)==($signed(A) % $signed(B))))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_SADD;
+-        $fwrite(f, "Test: Signed Addition\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, $signed(A) + $signed(B), (($signed(R)==($signed(A) + $signed(B)))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_SSUB;
+-        $fwrite(f, "Test: Signed Substraction\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, $signed(A) - $signed(B), (($signed(R)==($signed(A) - $signed(B)))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_SLES;
+-        $fwrite(f, "Test: Signed Less than\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %32b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, $signed(A) < $signed(B), ((R==($signed(A) < $signed(B)))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        //////
+-        #5
+-        modeSel = ALU_UMUL;
+-        $fwrite(f, "Test: Unsigned Multiply\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            liu = $unsigned(A);
+-            liu = liu * $unsigned(B);
+-            #5 $fwrite(f, "A: %h, B: %h, RX R: %h %h, Correct: %h %h, %s, ZCNO: %1b%1b%1b%1b\n", A, B, RX, R, liu[63:32], liu[31:0], (({RX,R}==$unsigned(liu))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_UDIV;
+-        $fwrite(f, "Test: Unsigned Division\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            tmp = $urandom_range(15,0);
+-            B = $signed(B) >>> tmp;
+-            #5 $fwrite(f, "A: %h, B: %h, R: %h, RX: %h, Correct: %h %h, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, RX, $unsigned(A) / $unsigned(B), $unsigned(A) % $unsigned(B), (($unsigned(R)==($unsigned(A) / $unsigned(B)) && ($unsigned(RX)==($unsigned(A) % $unsigned(B))))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_UADD;
+-        $fwrite(f, "Test: Unsigned Addition\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, $unsigned(A) + $unsigned(B), (($unsigned(R)==($unsigned(A) + $unsigned(B)))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_USUB;
+-        $fwrite(f, "Test: Unsigned Substraction\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, $unsigned(A) - $unsigned(B), (($unsigned(R)==($unsigned(A) - $unsigned(B)))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        #5
+-        modeSel = ALU_ULES;
+-        $fwrite(f, "Test: Unsigned Less than\n");
+-        for(i = 0; i < 15; i = i+1)begin
+-            A = $urandom;
+-            B = $urandom;
+-            #5 $fwrite(f, "A: %b, B: %b, R: %b, Correct: %32b, %s, ZCNO: %1b%1b%1b%1b\n", A, B, R, $unsigned(A) < $unsigned(B), ((R==($unsigned(A) < $unsigned(B)))?"RIGHT":"WRONG"), isRZero, isCarry, isRNegative, isOverflow);
+-        end
+-
+-        $fclose(f);
+-        $finish;
+-    end
+-
+-endmodule
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/computer_tb.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/computer_tb.v
+index 9ab88b7..e9353c0 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/computer_tb.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sim_1/new/computer_tb.v
+@@ -21,46 +21,31 @@
+ 
+ 
+ module computer_tb(
+-
+     );
+     reg clk_in;
+-    wire clk_div;
+     reg rst;
+     wire [31:0] inst;
+     wire [31:0] pc;
+     wire [31:0] addr;
+-    
+-    reg [31:0] instPrev;
+-    reg [31:0] pcPrev;
+-    wire cpuRunning;
+ 
+-    integer file_output;
+-    reg cpuEna = 1'b1;
+-
+-    computer uut(
++    sccomp_dataflow uut(
+         .clk_in(clk_in),
+-        .clk_afterDiv(clk_div),
+-        .cpuEna(cpuEna),
+         .reset(rst),
+         .inst(inst),
+         .pc(pc),
+-        .addr(addr),
+-        .cpuRunning(cpuRunning)
++        .addr(addr)
+     );
+     
+     initial begin
+         clk_in = 0;
+         rst = 1;
+-        file_output = $fopen("results.txt");
+-        #100
++        //file_output = $fopen("results.txt");
++        #5
+         //$readmemh("../../../Test/54_div.hex.txt", uut.imem.array_reg);
+-        #23
+         rst = 0;
+     end
+     
+     
+     
+     always #5 clk_in = ~clk_in;
+-    
+-    reg cpuDonotRecordFirst = 0;
+ endmodule
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/CLZAlgorithm.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/CLZAlgorithm.v
+index 0d1b6cf..54cf73d 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/CLZAlgorithm.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/CLZAlgorithm.v
+@@ -21,7 +21,9 @@ module CLZAlgorithm(
+         end
+     end
+ 
+-    assign busy = ena & (counter != COUNTER_CYCLE);
++    //assign busy = ena & (counter != COUNTER_CYCLE);
++    // webtest requires CALCULATION DONE IN ONE CYCLE
++    assign busy = 1'b0;
+ 
+     generate
+         genvar i;
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DIV.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DIV.v
+index e029172..2cb9c86 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DIV.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DIV.v
+@@ -27,7 +27,9 @@ module DIV(
+         end
+     end
+ 
+-    assign busy = ena & (counter != COUNTER_CYCLE);
++    //assign busy = ena & (counter != COUNTER_CYCLE);
++    // webtest requires CALCULATION DONE IN ONE CYCLE
++    assign busy = 1'b0;
+ 
+     //reg [32:0] r_dividend = 0;
+     wire [32:0] r_dividend = {1'b0, isUnsigned ? dividend : dividend[31] ? -dividend : dividend};
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DMEM_my.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DMEM_my.v
+new file mode 100644
+index 0000000..5ce57c7
+--- /dev/null
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/DMEM_my.v
+@@ -0,0 +1,20 @@
++module DMEM_my(
++    input clka,
++    input ena,
++    input [3:0] wea,
++    input [9:0] addra,
++    input [31:0] dina,
++    output [31:0] douta
++);
++    reg [31:0] array_reg [0:1023];
++    wire [31:0] newDina = {wea[3] ? dina[31:24] : array_reg[addra][31:24], wea[2] ? dina[23:16] : array_reg[addra][23:16], wea[1] ? dina[15:8] : array_reg[addra][15:8], wea[0] ? dina[7:0] : array_reg[addra][7:0]};
++    assign douta = ena ? array_reg[addra] : 32'hcfcfcfcf;
++    always @(posedge clka)
++    begin
++        if (ena)
++        begin
++            if (wea != 4'h0)
++                array_reg[addra] <= newDina;
++        end
++    end
++endmodule
+\ No newline at end of file
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/MULT.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/MULT.v
+index 102150e..6beb0d1 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/MULT.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/MULT.v
+@@ -27,7 +27,9 @@ always @(posedge clk) begin
+     end
+ end
+ 
+-assign busy = ena & (counter != COUNTER_CYCLE);
++//assign busy = ena & (counter != COUNTER_CYCLE);
++// webtest requires CALCULATION DONE IN ONE CYCLE
++assign busy = 1'b0;
+ 
+ reg [31:0] ax, bx;
+ wire [63:0] zx;
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/computer.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/computer.v
+index 4694434..49bad47 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/computer.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/computer.v
+@@ -33,7 +33,7 @@ module computer(
+     // DMEM
+     assign addr = dmemAEn ? dmemAAddr : 32'hFFFFFFFF;
+ 
+-    DMEM_block dmem (
++    DMEM_my dmem (
+         .clka(~clk),    // input wire clka
+         .ena(dmemAEn),      // input wire ena
+         .wea(dmemAWe),      // input wire [3 : 0] wea
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/controller.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/controller.v
+deleted file mode 100644
+index bc5afcd..0000000
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/controller.v
++++ /dev/null
+@@ -1,150 +0,0 @@
+-module controller(
+-    input cpuRunning,
+-    output reg rfRAddr1,
+-    output reg rfRAddr2,
+-    output reg aluA,
+-    output reg aluModeSel,
+-    output reg rfWe,
+-    output reg rfWAddr,
+-    output reg rfWData,
+-    output reg extend16S_1In,
+-    output reg dmemAEn,
+-    output reg dmemAAddr,
+-    output reg bytePos,
+-    output reg extend16UIn,
+-    output reg aluB,
+-    output reg dmemAWe_orig,
+-    output reg dmemAIn,
+-    
+-
+-);
+-
+-    localparam BigEndianCPU = 1'b0;
+-
+-    always @(*) begin
+-        if (cpuRunning) begin
+-            
+-
+-            rfRAddr1 = rs;
+-            rfRAddr2 = rt;
+-
+-            aluA = ((((iAdd | iAddu | iSub | iSubu) | (iAnd | iOr | iXor | iNor)) | ((iSlt | iSltu | iAddi) | (iAddiu | iAndi))) | (iOri | iXori | iLw | iSw | iBeq | iBne | iSlti | iSltiu | iDiv | iDivu | iMult | iMul | iMultu | iClz | iTeq)) ? rfRData1 : (iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iSb | iSh) ? rfRData2 : 32'h0;
+-            
+-            aluModeSel = ((iAdd | iAddi) ? ALU_SADD : 5'h00) | ((iAddu | iAddiu | iLw | iSw) ? ALU_UADD: 5'h00) | ((iSub) ? ALU_SSUB : 5'h00) | ((iSubu) ? ALU_USUB : 5'h00) | ((iAnd | iAndi) ? ALU_AND : 5'h00) | ((iOr | iOri) ? ALU_OR : 5'h00) | ((iXor | iXori) ? ALU_XOR : 5'h00) | ((iNor) ? ALU_NOR : 5'h00) | ((iSlt | iSlti) ? ALU_SLES : 5'h00) | ((iSltu | iSltiu) ? ALU_ULES : 5'h00) | ((iSll | iSb | iSh) ? ALU_SL : 5'h00) | ((iSrl | iSrlv) ? ALU_SRL : 5'h00) | ((iSra | iSrav) ? ALU_SRA : 5'h00) | ((iAdd | iAddi) ? ALU_SADD : 5'h00) | ((iBeq | iBne | iTeq) ? ALU_EQU : 5'h00) | ((iDiv) ? ALU_SDIV : 5'h00) | ((iDivu) ? ALU_UDIV : 5'h00) | ((iMult | iMul) ? ALU_SMUL : 5'h00) | ((iMultu) ? ALU_UMUL : 5'h00) | ((iClz) ? ALU_CLZ : 5'h00);
+-
+-            rfWe = ((iAdd | iSub) & (aluOverflow ? `DISABLE : `ENABLE)) | ((iAddu | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSlti | iSltiu | iLui | iJal | iMul | iJalr | iLbu | iLhu | iLb | iLh | iMfhi | iMflo | iMfc0 | iClz) & (`ENABLE));
+-
+-            rfWAddr = ((iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iSll | iSrl | iSra | iSllv | iSrlv | iSrav | iMul | iJalr | iMfhi | iMflo | iClz) ? rd : 5'h0) | ((iAddi | iAddiu | iAndi | iOri | iXori | iLw | iSlti | iSltiu | iLui | iLbu | iLhu | iLb | iLh | iMfc0) ? rt : 5'h0) | ((iJal) ? 5'd31 : 5'h0);
+-
+-            rfWData = ((iLw) ? dmemAOut : 32'h0) | ((iLui) ? {imm, 16'h0} : 32'h0) | ((iJal | iJalr) ? pcPlus4 : 32'h0) | ((iLbu) ? extend8UOut : 32'h0) | ((iLhu) ? extend16UOut : 32'h0) | ((iLb) ? extend8SOut : 32'h0) | ((iLh) ? extend16S_2Out : 32'h0)  | ((iMfhi) ? hi : 32'h0) | ((iMflo) ? lo : 32'h0)  | ((iMfc0) ? cp0RData : 32'h0) | ((~iLw & ~iLui & ~iJal & ~iJalr & ~iLbu & ~iLhu & ~iLb & ~iLh & ~iMfhi & ~iMflo & ~iMfc0) ? aluR : 32'h0);
+-
+-            extend16S_1In = imm;
+-
+-            
+-
+-            dmemAEn = ((iLw | iSw | iLbu | iLhu | iLb | iLh | iSb | iSh) & `ENABLE);
+-
+-            dmemAAddr = ((iLw | iSw) ? aluR : uaddR);
+-            
+-            bytePos = ((iLbu | iLb | iSb) ? {3'b000, dmemAAddr[1:0] ^ {2{BigEndianCPU}}} : 5'h00) | ((iLhu | iLh | iSh) ? {3'b000, dmemAAddr[1] ^ BigEndianCPU, 1'b0} : 5'h00);
+-
+-            extend16UIn = ((iAndi | iOri | iXori) ? imm : 16'h0) | ((iLhu) ? dmemAOut[8 * bytePos +: 16] : 16'h0);
+-            
+-            aluB = ((iAdd | iAddu | iSub | iSubu | iAnd | iOr | iXor | iNor | iSlt | iSltu | iBeq | iBne | iDiv | iDivu | iMult | iMul | iMultu | iTeq) ? rfRData2 : 32'h0) 
+-            | ((iSll | iSrl | iSra) ? shamt : 32'h0)
+-            | ((iSllv | iSrlv | iSrav) ? rfRData1 : 32'h0)
+-            | ((iAddi | iAddiu | iLw | iSw | iSlti | iSltiu) ? extend16S_1Out : 32'h0)
+-            | ((iAndi | iOri | iXori) ? extend16UOut : 32'h0)
+-            | ((iSb) ? (bytePos[1:0] << 3) : 32'h0)
+-            | ((iSh) ? (bytePos[1] ? 16 : 0) : 32'h0);
+-            
+-            
+-
+-            dmemAWe_orig = ((iSw) ? 4'hf : 4'h0) | ((iSb) ? {(bytePos[1:0] == 2'h3), (bytePos[1:0] == 2'h2), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0)} : 4'h0) | ((iSh) ? {(bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h1), (bytePos[1:0] == 2'h0), (bytePos[1:0] == 2'h0)} : 4'h0);
+-
+-            dmemAIn = (iSw ? rfRData2 : 32'h0) | ((iSb | iSh) ? aluR : 32'h0);
+-
+-            uaddA = ((iBeq | iBne | iBgez) ? pcPlus4 : 32'h0) | ((iLbu | iLhu | iLb | iLh | iSb | iSh) ? extend16S_1Out : 32'h0);
+-
+-            uaddB = (iBeq | iBne | iBgez) ? (extend16S_1Out << 2) : rfRData1;
+-
+-            nextHi = ((iDiv | iDivu | iMult | iMultu) ? aluRX : iMthi ? rfRData1 : hi);
+-
+-            nextLo = ((iDiv | iDivu | iMult | iMultu) ? aluR : iMtlo ? rfRData1 : lo);
+-
+-            extend8UIn = dmemAOut[8 * bytePos +: 8];
+-
+-            extend8SIn = dmemAOut[8 * bytePos +: 8];
+-
+-            extend16S_2In = dmemAOut[8 * bytePos +: 16];
+-
+-            cp0Exception = ((iBreak | iSyscall | (iTeq & aluR[0])) & `ENABLE);
+-
+-            cp0Cause = (iBreak ? {25'h0, `BREAKCAUSE, 2'h0} : 32'h0) | (iSyscall ? {25'h0, `SYSCALLCAUSE, 2'h0} : 32'h0) | ((iTeq & aluR[0]) ? {25'h0, `TEQCAUSE, 2'h0} : 32'h0);
+-
+-            cp0Addr = rd;
+-
+-            nextPC = ((iJr | iJalr) ? rfRData1 : 32'h0) | ((iBeq) ? (aluR[0] ? uaddR : pcPlus4) : 32'h0) | ((iBne) ? (aluR[0] ? pcPlus4 : uaddR) : 32'h0) | ((iJ | iJal) ? {pc[31:28], index, 2'b0} : 32'h0) | ((iBgez) ? (rfRData1[31] ? pcPlus4 : uaddR) : 32'h0) | ((iBreak | iSyscall | iTeq) ? (exceptionEntry) : 32'h0) | ((iEret) ? (cp0ExecAddr) : 32'h0) | ((~iJr & ~iJalr & ~iBeq & ~iBne & ~iJ & ~iJal & ~iBgez & ~iBreak & ~iSyscall & ~iTeq & ~iEret) ? pcPlus4 : 32'h0);
+-
+-            trap = (iTeq & aluR[0]);
+-
+-            cp0WData = rfRData1;
+-        end else begin
+-            bytePos = 'hx;
+-
+-            rfRAddr1 = 'hx;
+-
+-            rfRAddr2 = 'hx;
+-
+-            aluA = 'hx;
+-
+-            aluB = 'hx;
+-
+-            aluModeSel = 'hx;
+-
+-            rfWe = 0;
+-
+-            rfWAddr = 'hx;
+-
+-            rfWData = 'hx;
+-
+-            extend16S_1In = 'hx;
+-
+-            extend16UIn = 'hx;
+-
+-            dmemAEn = 0;
+-
+-            dmemAAddr = 'hx;
+-
+-            dmemAWe_orig = 0;
+-
+-            dmemAIn = 'hx;
+-
+-            uaddA = 'hx;
+-
+-            uaddB = 'hx;
+-
+-            nextHi = hi;
+-
+-            nextLo = lo;
+-
+-            extend8UIn = 'hx;
+-
+-            extend8SIn = 'hx;
+-
+-            extend16S_2In = 'hx;
+-
+-            cp0Exception = 0;
+-
+-            cp0Cause = 0;
+-
+-            cp0Addr = 'hx;
+-
+-            trap = 0;
+-
+-            cp0WData = 'hx;
+-
+-            nextPC = 32'hABABABAB;
+-        end
+-    end
+-endmodule
+\ No newline at end of file
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/nyarlathotep.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/nyarlathotep.v
+index 643f6e0..d95d001 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/nyarlathotep.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/nyarlathotep.v
+@@ -50,7 +50,7 @@ module nyarlathotep(
+     wire [31:0] rfRData2;
+ 
+     regfile cpu_ref(
+-        .clk(clk),
++        .clk(~clk),
+         .rst(reset),
+         .we(rfWe),
+         .cpuPaused(cpuPaused),
+@@ -247,8 +247,9 @@ module nyarlathotep(
+ 
+     localparam initInstAddr = 32'h00400000;
+     localparam initDataAddr = 32'h10010000;
++    localparam exceptionEntry = 32'h00400004;
+ 
+-    always @(posedge clk) begin
++    always @(posedge clk or posedge reset) begin
+         if(reset == `ENABLE) begin
+             startCounter <= 0;
+             pc <= initInstAddr;
+@@ -274,7 +275,8 @@ module nyarlathotep(
+ 
+     always @(negedge clk) begin
+         if(reset == `ENABLE) begin
+-            cpuStarted <= `DISABLE;
++            // cpuStarted <= `DISABLE;
++            cpuStarted <= `ENABLE;
+         end
+         else
+         begin
+@@ -286,7 +288,7 @@ module nyarlathotep(
+         end
+     end
+     
+-    localparam exceptionEntry = 32'h00000004;
++    
+ 
+ 
+     `define SYSCALLCAUSE  5'b01000
+@@ -306,6 +308,7 @@ module nyarlathotep(
+     reg trap;
+     reg [3:0] dmemAWe_orig;
+     assign dmemAWe = dmemAWe_orig & {4{cpuRunning & ~cpuPaused}};
++    wire [31:0] pc_out = pc;
+     localparam BigEndianCPU = 1'b0;
+ 
+     always @(*) begin
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/regfile.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/regfile.v
+index d3af828..61ca4e6 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/regfile.v
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/regfile.v
+@@ -23,7 +23,7 @@ module regfile #(
+     assign rdata2 = array_reg[raddr2];
+ 
+     integer j;
+-    always @(posedge clk)
++    always @(posedge clk or posedge rst)
+     begin
+         if(rst) begin
+             for(j = 0; j < num; j = j + 1)
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/sccomp_dataflow.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/sccomp_dataflow.v
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/sccomp_dataflow_foroj.v b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/sccomp_dataflow_foroj.v
+new file mode 100644
+index 0000000..a237cdd
+--- /dev/null
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.srcs/sources_1/new/sccomp_dataflow_foroj.v
+@@ -0,0 +1,87 @@
++module sccomp_dataflow(
++    input clk_in,
++    input reset,
++    output [31:0] inst,
++    output [31:0] pc,
++    output [31:0] addr
++);
++    //////////////////
++    /// Frequency divider
++    //  We no longer need this in an webtest-oriented top module
++    // cpu_div #(4) cpu_clk(clk_in, clk);
++    // ADD
++    wire clk_afterDiv;
++    assign clk_afterDiv = clk_in;
++
++    ////////////////
++    /// DMEM
++    /// Port A: Work at falling edge of clk.
++    /// Port B: Work at rising edge of clk.
++    wire dmemAEn;
++    wire [3:0] dmemAWe;
++    wire [31:0] dmemAAddr;
++    wire [31:0] dmemAIn;
++    wire [31:0] dmemAOut;
++
++    /////////
++    /// DMEM Address Mapper
++    wire [31:0] dmemARealAddr = dmemAAddr - 32'h10010000;
++
++    // DMEM
++    assign addr = dmemAEn ? dmemAAddr : 32'hFFFFFFFF;
++
++    DMEM_block dmem (
++        .clka(~clk_afterDiv),    // input wire clka
++        .ena(dmemAEn),      // input wire ena
++        .wea(dmemAWe),      // input wire [3 : 0] wea
++        .addra(dmemARealAddr[11:2]),  // input wire [9 : 0] addra
++        .dina(dmemAIn),    // input wire [31 : 0] dina
++        .douta(dmemAOut)   // output wire [31 : 0] douta
++    );
++
++    //////////////
++    /// IMEM
++    ///
++    wire imemWe;
++    wire [31:0] imemRAddr;
++    wire [31:0] imemOut;
++
++    assign pc = imemRAddr;
++    assign inst = imemOut;
++
++    ///////////////
++    /// IMEM Address Mapper
++
++    //////////////////
++    /// IMEM
++    wire [31:0] imemWAddr = 0;
++    wire [31:0] imemSelectedAddr = imemWe ? imemWAddr : imemRAddr;
++    wire [31:0] imemRealAddr = imemSelectedAddr - 32'h00400000;
++    wire [31:0] imemWData = 32'hffffffff;
++    IMEM_dist imem (
++        .a(imemSelectedAddr[13:2]),
++        .d(32'hFFFFFFFF),
++        .clk(clk_afterDiv),
++        .we(imemWe),
++        .spo(imemOut)
++    );
++
++    //////////////
++    /// CPU Instantiation
++    nyarlathotep sccpu(
++        .clk(clk_afterDiv),
++        .reset(reset),
++        .ena(1'b1),
++        .dmemAEn(dmemAEn),
++        .dmemAWe(dmemAWe),
++        .dmemAAddr(dmemAAddr),
++        .dmemAIn(dmemAIn),
++        .dmemAOut(dmemAOut),
++        .cpuRunning(cpuRunning),
++        .pc(imemRAddr),
++        .inst(imemOut),
++        .imemWAddr(imemWAddr),
++        .imemWData(imemWData),
++        .imemWe(imemWe)
++    );
++endmodule
+\ No newline at end of file
+diff --git a/CPU-Nyarlathotep/CPU-Nyarlathotep.xpr b/CPU-Nyarlathotep/CPU-Nyarlathotep.xpr
+index d75509b..19b7295 100644
+--- a/CPU-Nyarlathotep/CPU-Nyarlathotep.xpr
++++ b/CPU-Nyarlathotep/CPU-Nyarlathotep.xpr
+@@ -26,7 +26,7 @@
+     <Option Name="IPStaticSourceDir" Val="$PPRDIR/CPU-Nyarlathotep.ip_user_files/ipstatic"/>
+     <Option Name="EnableBDX" Val="FALSE"/>
+     <Option Name="DSABoardId" Val="nexys4_ddr"/>
+-    <Option Name="WTXSimLaunchSim" Val="24"/>
++    <Option Name="WTXSimLaunchSim" Val="35"/>
+     <Option Name="WTModelSimLaunchSim" Val="16"/>
+     <Option Name="WTQuestaLaunchSim" Val="0"/>
+     <Option Name="WTIesLaunchSim" Val="0"/>
+@@ -113,22 +113,31 @@
+           <Attr Name="UsedIn" Val="simulation"/>
+         </FileInfo>
+       </File>
+-      <File Path="$PSRCDIR/sources_1/new/cpu_div.v">
++      <File Path="$PSRCDIR/sources_1/new/nyarlathotep.v">
+         <FileInfo>
+           <Attr Name="UsedIn" Val="synthesis"/>
+           <Attr Name="UsedIn" Val="implementation"/>
+           <Attr Name="UsedIn" Val="simulation"/>
+         </FileInfo>
+       </File>
+-      <File Path="$PSRCDIR/sources_1/new/nyarlathotep.v">
++      <File Path="$PSRCDIR/sources_1/new/sccomp_dataflow_foroj.v">
+         <FileInfo>
+           <Attr Name="UsedIn" Val="synthesis"/>
+           <Attr Name="UsedIn" Val="implementation"/>
+           <Attr Name="UsedIn" Val="simulation"/>
+         </FileInfo>
+       </File>
++      <File Path="$PSRCDIR/sources_1/new/cpu_div.v">
++        <FileInfo>
++          <Attr Name="AutoDisabled" Val="1"/>
++          <Attr Name="UsedIn" Val="synthesis"/>
++          <Attr Name="UsedIn" Val="implementation"/>
++          <Attr Name="UsedIn" Val="simulation"/>
++        </FileInfo>
++      </File>
+       <File Path="$PSRCDIR/sources_1/new/computer.v">
+         <FileInfo>
++          <Attr Name="AutoDisabled" Val="1"/>
+           <Attr Name="UsedIn" Val="synthesis"/>
+           <Attr Name="UsedIn" Val="implementation"/>
+           <Attr Name="UsedIn" Val="simulation"/>
+@@ -172,14 +181,6 @@
+           <Attr Name="UsedIn" Val="simulation"/>
+         </FileInfo>
+       </File>
+-      <File Path="$PSRCDIR/sources_1/new/sccomp_dataflow.v">
+-        <FileInfo>
+-          <Attr Name="AutoDisabled" Val="1"/>
+-          <Attr Name="UsedIn" Val="synthesis"/>
+-          <Attr Name="UsedIn" Val="implementation"/>
+-          <Attr Name="UsedIn" Val="simulation"/>
+-        </FileInfo>
+-      </File>
+       <File Path="$PSRCDIR/sources_1/new/seg7x16.v">
+         <FileInfo>
+           <Attr Name="AutoDisabled" Val="1"/>
+@@ -221,9 +222,17 @@
+           <Attr Name="UsedIn" Val="simulation"/>
+         </FileInfo>
+       </File>
++      <File Path="$PSRCDIR/sources_1/new/DMEM_my.v">
++        <FileInfo>
++          <Attr Name="AutoDisabled" Val="1"/>
++          <Attr Name="UsedIn" Val="synthesis"/>
++          <Attr Name="UsedIn" Val="implementation"/>
++          <Attr Name="UsedIn" Val="simulation"/>
++        </FileInfo>
++      </File>
+       <Config>
+         <Option Name="DesignMode" Val="RTL"/>
+-        <Option Name="TopModule" Val="computer"/>
++        <Option Name="TopModule" Val="sccomp_dataflow"/>
+       </Config>
+     </FileSet>
+     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+@@ -299,17 +308,22 @@
+           <Attr Name="UsedIn" Val="simulation"/>
+         </FileInfo>
+       </File>
++      <File Path="$PPRDIR/computer_tb_behav.wcfg">
++        <FileInfo>
++          <Attr Name="UsedIn" Val="simulation"/>
++        </FileInfo>
++      </File>
+       <Config>
+         <Option Name="DesignMode" Val="RTL"/>
+         <Option Name="TopModule" Val="computer_tb"/>
+         <Option Name="TopLib" Val="xil_defaultlib"/>
+         <Option Name="TransportPathDelay" Val="0"/>
+         <Option Name="TransportIntDelay" Val="0"/>
+-        <Option Name="SimMode" Val="post-synthesis"/>
+         <Option Name="SrcSet" Val="sources_1"/>
+         <Option Name="XSimWcfgFile" Val="$PPRDIR/computer_tb_time_synth.wcfg"/>
+         <Option Name="XSimWcfgFile" Val="$PPRDIR/computer_tb_behav2.wcfg"/>
+         <Option Name="XSimWcfgFile" Val="$PPRDIR/computer_tb_behav2.wcfg"/>
++        <Option Name="XSimWcfgFile" Val="$PPRDIR/computer_tb_behav.wcfg"/>
+         <Option Name="xsim.simulate.runtime" Val="100000ns"/>
+         <Option Name="modelsim.simulate.runtime" Val="10000ns"/>
+       </Config>
+diff --git a/CPU-Nyarlathotep/Problems encountered during fkingly making 54-instruction MIPS CPU and solutions.md b/CPU-Nyarlathotep/Problems encountered during fkingly making 54-instruction MIPS CPU and solutions.md
+new file mode 100644
+index 0000000..95c31f7
+--- /dev/null
++++ b/CPU-Nyarlathotep/Problems encountered during fkingly making 54-instruction MIPS CPU and solutions.md	
+@@ -0,0 +1,10 @@
++Problems encountered during f\*\*kingly making 54-instruction MIPS CPU and solutions
++===
++
++
++
++1. CPU is not initialized at all.
++   - My stupid mistake of forgetting to update the wire identifier.
++   - The CPU must respond to **positive edge of reset** to set PC because of the f\*\*king website autotest. (Asynchronous reset)
++2. CPU runs for some instructions and then paused because PC turns into 'XXX.
++   - The register file, memories must all respond to posedge edge of reset.
+\ No newline at end of file
+diff --git a/CPU-Nyarlathotep/computer_tb_behav.wcfg b/CPU-Nyarlathotep/computer_tb_behav.wcfg
+new file mode 100644
+index 0000000..6fc7280
+--- /dev/null
++++ b/CPU-Nyarlathotep/computer_tb_behav.wcfg
+@@ -0,0 +1,100 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<wave_config>
++   <wave_state>
++   </wave_state>
++   <db_ref_list>
++      <db_ref path="computer_tb_behav.wdb" id="1">
++         <top_modules>
++            <top_module name="computer_tb" />
++            <top_module name="glbl" />
++         </top_modules>
++      </db_ref>
++   </db_ref_list>
++   <zoom_setting>
++      <ZoomStartTime time="0fs"></ZoomStartTime>
++      <ZoomEndTime time="45100001fs"></ZoomEndTime>
++      <Cursor1Time time="0fs"></Cursor1Time>
++   </zoom_setting>
++   <WVObjectSize size="20" />
++   <wvobject fp_name="/computer_tb/clk_in" type="logic">
++      <obj_property name="ElementShortName">clk_in</obj_property>
++      <obj_property name="ObjectShortName">clk_in</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/rst" type="logic">
++      <obj_property name="ElementShortName">rst</obj_property>
++      <obj_property name="ObjectShortName">rst</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/inst" type="array">
++      <obj_property name="ElementShortName">inst[31:0]</obj_property>
++      <obj_property name="ObjectShortName">inst[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/pc" type="array">
++      <obj_property name="ElementShortName">pc[31:0]</obj_property>
++      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg[28]" type="array">
++      <obj_property name="ElementShortName">[28][31:0]</obj_property>
++      <obj_property name="ObjectShortName">[28][31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg[29]" type="array">
++      <obj_property name="ElementShortName">[29][31:0]</obj_property>
++      <obj_property name="ObjectShortName">[29][31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg[30]" type="array">
++      <obj_property name="ElementShortName">[30][31:0]</obj_property>
++      <obj_property name="ObjectShortName">[30][31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg[31]" type="array">
++      <obj_property name="ElementShortName">[31][31:0]</obj_property>
++      <obj_property name="ObjectShortName">[31][31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/cpu_ref/array_reg" type="array">
++      <obj_property name="ElementShortName">array_reg[0:31][31:0]</obj_property>
++      <obj_property name="ObjectShortName">array_reg[0:31][31:0]</obj_property>
++      <obj_property name="isExpanded"></obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/iBeq" type="logic">
++      <obj_property name="ElementShortName">iBeq</obj_property>
++      <obj_property name="ObjectShortName">iBeq</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/iBne" type="logic">
++      <obj_property name="ElementShortName">iBne</obj_property>
++      <obj_property name="ObjectShortName">iBne</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/aluR" type="array">
++      <obj_property name="ElementShortName">aluR[31:0]</obj_property>
++      <obj_property name="ObjectShortName">aluR[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/uaddR" type="array">
++      <obj_property name="ElementShortName">uaddR[31:0]</obj_property>
++      <obj_property name="ObjectShortName">uaddR[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/aluA" type="array">
++      <obj_property name="ElementShortName">aluA[31:0]</obj_property>
++      <obj_property name="ObjectShortName">aluA[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/aluB" type="array">
++      <obj_property name="ElementShortName">aluB[31:0]</obj_property>
++      <obj_property name="ObjectShortName">aluB[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/aluBusy" type="logic">
++      <obj_property name="ElementShortName">aluBusy</obj_property>
++      <obj_property name="ObjectShortName">aluBusy</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/rfRAddr1" type="array">
++      <obj_property name="ElementShortName">rfRAddr1[4:0]</obj_property>
++      <obj_property name="ObjectShortName">rfRAddr1[4:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/rfRAddr2" type="array">
++      <obj_property name="ElementShortName">rfRAddr2[4:0]</obj_property>
++      <obj_property name="ObjectShortName">rfRAddr2[4:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/rfRData1" type="array">
++      <obj_property name="ElementShortName">rfRData1[31:0]</obj_property>
++      <obj_property name="ObjectShortName">rfRData1[31:0]</obj_property>
++   </wvobject>
++   <wvobject fp_name="/computer_tb/uut/sccpu/rfRData2" type="array">
++      <obj_property name="ElementShortName">rfRData2[31:0]</obj_property>
++      <obj_property name="ObjectShortName">rfRData2[31:0]</obj_property>
++   </wvobject>
++</wave_config>
+diff --git "a/CPU-Nyarlathotep/\350\256\241\347\273\204CPU\345\256\236\351\252\214\346\212\245\345\221\212-1652270-\345\206\257\350\210\234.docx" "b/CPU-Nyarlathotep/\350\256\241\347\273\204CPU\345\256\236\351\252\214\346\212\245\345\221\212-1652270-\345\206\257\350\210\234.docx"
+new file mode 100644
+index 0000000..75487b4
+Binary files /dev/null and "b/CPU-Nyarlathotep/\350\256\241\347\273\204CPU\345\256\236\351\252\214\346\212\245\345\221\212-1652270-\345\206\257\350\210\234.docx" differ

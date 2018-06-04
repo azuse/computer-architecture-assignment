@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="sccomp_dataflow_forboard_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="sccomp_dataflow_forboard_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="963766334fs"></ZoomStartTime>
+      <ZoomEndTime time="1093166335fs"></ZoomEndTime>
+      <Cursor1Time time="994566000fs"></Cursor1Time>
+   </zoom_setting>
+   <WVObjectSize size="15" />
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/clk_in" type="logic">
+      <obj_property name="ElementShortName">clk_in</obj_property>
+      <obj_property name="ObjectShortName">clk_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/sw" type="array">
+      <obj_property name="ElementShortName">sw[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sw[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/o_seg" type="array">
+      <obj_property name="ElementShortName">o_seg[7:0]</obj_property>
+      <obj_property name="ObjectShortName">o_seg[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/o_sel" type="array">
+      <obj_property name="ElementShortName">o_sel[7:0]</obj_property>
+      <obj_property name="ObjectShortName">o_sel[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/inst" type="array">
+      <obj_property name="ElementShortName">inst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/seg7_cs" type="logic">
+      <obj_property name="ElementShortName">seg7_cs</obj_property>
+      <obj_property name="ObjectShortName">seg7_cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/switch_cs" type="logic">
+      <obj_property name="ElementShortName">switch_cs</obj_property>
+      <obj_property name="ObjectShortName">switch_cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/dmemAOut_Selected" type="array">
+      <obj_property name="ElementShortName">dmemAOut_Selected[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dmemAOut_Selected[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/i_data_store" type="array">
+      <obj_property name="ElementShortName">i_data_store[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_store[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/uut/dmemAEn" type="logic">
+      <obj_property name="ElementShortName">dmemAEn</obj_property>
+      <obj_property name="ObjectShortName">dmemAEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/uut/dmemAWe" type="array">
+      <obj_property name="ElementShortName">dmemAWe[3:0]</obj_property>
+      <obj_property name="ObjectShortName">dmemAWe[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/uut/dmemAAddr" type="array">
+      <obj_property name="ElementShortName">dmemAAddr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dmemAAddr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sccomp_dataflow_forboard_tb/uut/sccpu/cpu_ref/array_reg" type="array">
+      <obj_property name="ElementShortName">array_reg[0:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">array_reg[0:31][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+</wave_config>
