@@ -60,9 +60,11 @@ ENTITY IMEM IS
   PORT (
     a : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
     d : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dpra : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
     clk : IN STD_LOGIC;
     we : IN STD_LOGIC;
-    spo : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+    spo : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+    dpo : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
   );
 END IMEM;
 
@@ -129,8 +131,8 @@ ARCHITECTURE IMEM_arch OF IMEM IS
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF IMEM_arch : ARCHITECTURE IS "IMEM,dist_mem_gen_v8_0_10,{}";
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF IMEM_arch: ARCHITECTURE IS "IMEM,dist_mem_gen_v8_0_10,{x_ipProduct=Vivado 2016.2,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=dist_mem_gen,x_ipVersion=8.0,x_ipCoreRevision=10,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=artix7,C_ADDR_WIDTH=13,C_DEFAULT_DATA=0,C_DEPTH=8192,C_HAS_CLK=1,C_HAS_D=1,C_HAS_DPO=0,C_HAS_DPRA=0,C_HAS_I_CE=0,C_HAS_QDPO=0,C_HAS_QDPO_CE=0,C_HAS_QDPO_CLK=0,C_HAS_QDPO_RST=0,C_HAS_QDPO_SRST=0,C_HAS_QSPO=0,C_HAS_QSPO_CE=0,C_HAS_QSPO_RST=0,C_HAS_QSPO_SRST=0,C_HAS_SPO=1,C_HAS_WE=1,C_MEM_INIT_FILE=IME" & 
-"M.mif,C_ELABORATION_DIR=./,C_MEM_TYPE=1,C_PIPELINE_STAGES=0,C_QCE_JOINED=0,C_QUALIFY_WE=0,C_READ_MIF=1,C_REG_A_D_INPUTS=0,C_REG_DPRA_INPUT=0,C_SYNC_ENABLE=1,C_WIDTH=32,C_PARSER_TYPE=1}";
+  ATTRIBUTE CORE_GENERATION_INFO OF IMEM_arch: ARCHITECTURE IS "IMEM,dist_mem_gen_v8_0_10,{x_ipProduct=Vivado 2016.2,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=dist_mem_gen,x_ipVersion=8.0,x_ipCoreRevision=10,x_ipLanguage=VERILOG,x_ipSimLanguage=MIXED,C_FAMILY=artix7,C_ADDR_WIDTH=13,C_DEFAULT_DATA=0,C_DEPTH=8192,C_HAS_CLK=1,C_HAS_D=1,C_HAS_DPO=1,C_HAS_DPRA=1,C_HAS_I_CE=0,C_HAS_QDPO=0,C_HAS_QDPO_CE=0,C_HAS_QDPO_CLK=0,C_HAS_QDPO_RST=0,C_HAS_QDPO_SRST=0,C_HAS_QSPO=0,C_HAS_QSPO_CE=0,C_HAS_QSPO_RST=0,C_HAS_QSPO_SRST=0,C_HAS_SPO=1,C_HAS_WE=1,C_MEM_INIT_FILE=IME" & 
+"M.mif,C_ELABORATION_DIR=./,C_MEM_TYPE=2,C_PIPELINE_STAGES=0,C_QCE_JOINED=0,C_QUALIFY_WE=0,C_READ_MIF=1,C_REG_A_D_INPUTS=0,C_REG_DPRA_INPUT=0,C_SYNC_ENABLE=1,C_WIDTH=32,C_PARSER_TYPE=1}";
 BEGIN
   U0 : dist_mem_gen_v8_0_10
     GENERIC MAP (
@@ -140,8 +142,8 @@ BEGIN
       C_DEPTH => 8192,
       C_HAS_CLK => 1,
       C_HAS_D => 1,
-      C_HAS_DPO => 0,
-      C_HAS_DPRA => 0,
+      C_HAS_DPO => 1,
+      C_HAS_DPRA => 1,
       C_HAS_I_CE => 0,
       C_HAS_QDPO => 0,
       C_HAS_QDPO_CE => 0,
@@ -156,7 +158,7 @@ BEGIN
       C_HAS_WE => 1,
       C_MEM_INIT_FILE => "IMEM.mif",
       C_ELABORATION_DIR => "./",
-      C_MEM_TYPE => 1,
+      C_MEM_TYPE => 2,
       C_PIPELINE_STAGES => 0,
       C_QCE_JOINED => 0,
       C_QUALIFY_WE => 0,
@@ -170,7 +172,7 @@ BEGIN
     PORT MAP (
       a => a,
       d => d,
-      dpra => STD_LOGIC_VECTOR(TO_UNSIGNED(0, 13)),
+      dpra => dpra,
       clk => clk,
       we => we,
       i_ce => '1',
@@ -181,6 +183,7 @@ BEGIN
       qdpo_rst => '0',
       qspo_srst => '0',
       qdpo_srst => '0',
-      spo => spo
+      spo => spo,
+      dpo => dpo
     );
 END IMEM_arch;

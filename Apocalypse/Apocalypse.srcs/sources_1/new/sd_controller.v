@@ -1,9 +1,6 @@
 `timescale 1ns/1ns
 
-`define Enabled 1'b1
-`define Disabled 1'b0
-`define True 1'b1
-`define False 1'b0
+`include "sdHeader.vh"
 
 /* SD 卡控制器。驱动 SPI 控制器控制 SD 卡。*/
 module sd_controller(
@@ -57,7 +54,11 @@ module sd_controller(
     output reg acmd41InitAbandoned,
     output reg cmd58ReadOcrHaveGot,
     output reg cmd58ReadOcrNotBusy,
-    output reg cmd58ReadOcrCCS     // Card Capacity Status
+    output reg cmd58ReadOcrCCS,     // Card Capacity Status
+
+    output reg [10:0] responseByteCounter,
+    output reg responseStart
+
     
 );
 
@@ -72,17 +73,50 @@ module sd_controller(
     reg [7:0] expectedSpiRxData;
     reg [7:0] invalidSpiRxData;
 
-    reg receivedSpiRxData;
     reg [9:0] waitSpiRxDataCounter;
     reg [9:0] retryACMD41Counter;
-    reg [5:0] responseByteCounter;
-    reg responseStart;
 
     reg [31:0] iReadSectorNumStored;
 
+    reg startBlockTokenReceived;
+
     // S for states
-    localparam S_RESET = 8'hFF;
-    localparam S_RESET = 8'hFF;
+    localparam
+    S_SD_RESET = 8'hFF,
+    S_SD_PREDELAY = 8'h00,
+    S_SD_DELAY = 8'h01,
+    S_SD_CLK74 = 8'h02,
+    S_SD_SDRESET_PRE = 8'h03,
+    S_SD_SDRESET_RESP_PRE = 8'h04,
+    S_SD_ASKVOLTAGE_PRE = 8'h05,
+    S_SD_ASKVOLTAGE_RESP_PRE = 8'h06,
+    S_SD_ASKVOLTAGE_RESP_CHECK = 8'h07,
+    S_SD_SDINIT_PRE = 8'h08,
+    S_SD_SDINIT_CMD55_RESP_PRE = 8'h09,
+    S_SD_SDINIT_CMD55_INVALID = 8'h0A,
+    S_SD_SDINIT_ACMD41_PRE = 8'h0B,
+    S_SD_SDINIT_ACMD41_RESP_PRE = 8'h0C,
+    S_SD_SDINIT_RETRY = 8'h0D,
+    S_SD_READOCR_PRE = 8'h0E,
+    S_SD_READOCR_RESP_PRE = 8'h0F,
+    S_SD_READOCR_RESP_CHECK = 8'h10,
+    S_SD_GENERAL_RESP_CHECK = 8'h11,
+    S_SD_GENERAL_RESP_CHECK_DO = 8'h12,
+    S_SD_TXCMD = 8'h13,
+    S_SD_TXCMD_DO = 8'h14,
+    S_SD_8CLK = 8'h15,
+    S_SD_ERR = 8'h16,
+    S_SD_IDLE = 8'h17,
+    S_SD_READ_PRE = 8'h18,
+    S_SD_READ = 8'h19,
+    S_SD_READ_DO = 8'h1A,
+    S_SD_MULTIREADDONE_PRE = 8'h1B,
+    S_SD_MULTIREADDONE_PAUSE = 8'h1C,
+    S_SD_MULTIREADDONE_RESP_PRE = 8'h1D,
+    S_SD_MULTIREADDONE_RESP_ZERO = 8'h1E,
+    S_SD_MULTIREADDONE_POST = 8'h1F,
+    S_SD_MULTIREADDONE_POST_POST = 8'h20;
+
     
     // COMMANDS
     localparam CMD0 = {8'hff, 2'b01, 6'h0, 32'h0, 8'h95}; 
@@ -121,16 +155,17 @@ module sd_controller(
     localparam RESP_ACMD41_INVALID = 8'h01;
 
     localparam T_DELAYTICKS = 12'd4000;     // 40μs
+    localparam T_RESPMAXCNT = 120;
+    localparam T_RESPMAXCNT_READ = 4800;
 
     // 启动延迟
     reg [11:0] startDelayCounter = 0;
 
     // 主状态机
     always @(posedge clk)
-    if(rst || (iStartEn && sdState == S_RESET)) begin
-        sdState <= S_PREDELAY;
+    if(rst || (iStartEn && sdState == S_SD_RESET)) begin
         oStartOk <= `Disabled;
-        iReadOk <= `False;
+        oReadOk <= `False;
         oReadData <= 'h0;
         oReadDataValid <= `False;
         oReadDataASectorDone <= `False;
@@ -139,7 +174,7 @@ module sd_controller(
         oSpiTxEn <= `Disabled;
         oSpiTxData <= 'h0;
         oSpiRxEn <= `Disabled;
-        iSpiClk8En <= `Disabled;
+        oSpiClk8En <= `Disabled;
 
         cmd0ResetOk <= `False;
         cmd1LegacyInitOk <= `False;
@@ -147,6 +182,7 @@ module sd_controller(
         cmd55AppCommandOk <= `False;
         acmd41InitOk <= `False;
 
+        sdState <= S_SD_PREDELAY;
         error <= `False;
         oDebugInfo <= 'hABABABABCDCDCDCD;
         oDebugInfoAvailable <= `False;
@@ -156,23 +192,24 @@ module sd_controller(
         cmd58ReadOcrNotBusy <= `False;
         cmd58ReadOcrCCS <= `False;
 
-        nextState <= S_RESET;
-        nextNextState <= S_RESET;
-        nextNextNextState <= S_RESET;
-        nextStateIfInvalid <= S_RESET;
-        nextStateToRetry <= S_RESET;
+        nextState <= S_SD_RESET;
+        nextNextState <= S_SD_RESET;
+        nextNextNextState <= S_SD_RESET;
+        nextStateIfInvalid <= S_SD_RESET;
+        nextStateToRetry <= S_SD_RESET;
 
         command <= 'h0;
         commandByteCounter <= 'h0;
         expectedSpiRxData <= 'h0;
         invalidSpiRxData <= 'h0;
         
-        receivedSpiRxData <= `False;
         waitSpiRxDataCounter <= 'h0;
         retryACMD41Counter <= 'h0;
         responseByteCounter <= 'h0;
+        responseStart <= 'h0;
 
         iReadSectorNumStored <= 'hEFEFEFEF;
+        startBlockTokenReceived <= `False;
     end else begin
         if (oDebugInfoAvailable)
             oDebugInfoAvailable <= `Disabled;
@@ -187,69 +224,69 @@ module sd_controller(
             oReadDataASectorDone <= `Disabled;
 
         case(sdState)
-            S_PREDELAY:
+            S_SD_PREDELAY:
                 if (iStartEn) begin
-                    sdState <= S_DELAY;
+                    sdState <= S_SD_DELAY;
                     startDelayCounter <= 0;
                     oSpiEn <= `Enabled;
                 end else begin
                     oSpiEn <= `Disabled;
                 end
 
-            S_DELAY:
+            S_SD_DELAY:
                 if (startDelayCounter == T_DELAYTICKS - 1)
                 begin
-                    sdState <= S_CLK74;
+                    sdState <= S_SD_CLK74;
                 end else begin
-                    startDelayCounter += startDelayCounter + 1;
+                    startDelayCounter <= startDelayCounter + 1;
                 end
 
-            S_CLK74:
+            S_SD_CLK74:
                 if (iSpiClk74Ok) begin
                     oSpiClk74En <= `Disabled;
-                    sdState <= S_SDRESET_PRE;
+                    sdState <= S_SD_SDRESET_PRE;
                 end else begin
                     oSpiClk74En <= `Enabled;
                 end
             
-            S_SDRESET_PRE:
+            S_SD_SDRESET_PRE:
                 begin
                     command <= CMD0;
                     commandByteCounter <= LEN_CMD0;
-                    nextState <= S_SDRESET_RESP_PRE;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_SDRESET_RESP_PRE;
+                    sdState <= S_SD_TXCMD;
                 end
 
-            S_SDRESET_RESP_PRE:
+            S_SD_SDRESET_RESP_PRE:
                 begin
                     cmd0ResetOk <= `False;
                     expectedSpiRxData <= RESP_CMD0;
                     invalidSpiRxData <= RESP_LOWLEVEL;
-                    nextState <= S_ASKVOLTAGE_PRE;
-                    nextStateIfInvalid <= S_ERR;
-                    nextStateToRetry <= S_SDRESET_PRE;
-                    sdState <= S_GENERAL_RESP_CHECK;
+                    nextState <= S_SD_ASKVOLTAGE_PRE;
+                    nextStateIfInvalid <= S_SD_ERR;
+                    nextStateToRetry <= S_SD_SDRESET_PRE;   // 
+                    sdState <= S_SD_GENERAL_RESP_CHECK;
                 end
 
-            S_ASKVOLTAGE_PRE:
+            S_SD_ASKVOLTAGE_PRE:
                 begin
                     cmd0ResetOk <= `True;
                     command = CMD8;
                     commandByteCounter <= LEN_CMD8;
-                    nextState <= S_ASKVOLTAGE_RESP_PRE;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_ASKVOLTAGE_RESP_PRE;
+                    sdState <= S_SD_TXCMD;
                 end
 
-            S_ASKVOLTAGE_RESP_PRE:
+            S_SD_ASKVOLTAGE_RESP_PRE:
                 begin
                     cmd8AskVoltageOk <= `False;
                     responseByteCounter <= 5;
                     responseStart <= `False;
                     waitSpiRxDataCounter <= 0;
-                    sdState <= S_ASKVOLTAGE_RESP_CHECK;
+                    sdState <= S_SD_ASKVOLTAGE_RESP_CHECK;
                 end
 
-            S_ASKVOLTAGE_RESP_CHECK_DO:
+            S_SD_ASKVOLTAGE_RESP_CHECK:
                 if (iSpiRxOk) begin
                     oSpiRxEn <= `Disabled;
                     if(!responseStart) begin
@@ -258,33 +295,33 @@ module sd_controller(
                             case (iSpiRxData)
                                 RESP_CMD8:
                                 begin
-                                    nextState <= S_SDINIT_PRE;
+                                    nextState <= S_SD_SDINIT_PRE;
                                     responseStart <= `True;
                                 end
 
                                 RESP_CMD_ILLEGAL:
                                 begin
-                                    nextState <= S_ERR;
+                                    nextState <= S_SD_ERR;
                                     oDebugInfoAvailable <= `Enabled;
                                     oDebugInfo[7:0] <= iSpiRxData;
                                     oDebugInfo[63:8] <= 56'h58;
-                                    sdState <= S_8CLK;
+                                    sdState <= S_SD_8CLK;
                                 end
 
                                 default:
                                 begin
-                                    nextState <= S_ASKVOLTAGE_PRE;
+                                    nextState <= S_SD_ASKVOLTAGE_PRE;
                                     oDebugInfoAvailable <= `Enabled;
                                     oDebugInfo[7:0] <= iSpiRxData;
                                     oDebugInfo[63:8] <= 56'h68;
-                                    sdState <= S_8CLK;
+                                    sdState <= S_SD_8CLK;
                                 end
                             endcase
                         end else if (waitSpiRxDataCounter == T_RESPMAXCNT) begin
                             oDebugInfoAvailable <= `Enabled;
-                            oDebugInfo[11:0] <= waitSpiRxDataCounter;
-                            oDebugInfo[63:12] <= {32'hCC, 8'hAB, nextState};
-                            sdState <= S_ASKVOLTAGE_PRE;
+                            oDebugInfo[15:0] <= waitSpiRxDataCounter;
+                            oDebugInfo[63:16] <= {32'hCC, 8'hAc, nextState};
+                            sdState <= S_SD_ASKVOLTAGE_PRE;
                         end else begin
                             waitSpiRxDataCounter <= waitSpiRxDataCounter + 1;
                         end
@@ -295,21 +332,21 @@ module sd_controller(
                             begin
                                 if (iSpiRxData != 8'hAA) begin
                                     oDebugInfoAvailable <= `True;
-                                    oDebugInfo <= {56'hFD, iSpiRxData};
-                                    nextState <= S_ERR;
+                                    oDebugInfo <= {56'hFDFD, iSpiRxData};
+                                    nextState <= S_SD_ERR;
                                 end else begin
-                                    if (nextState != S_ERR)
+                                    if (nextState != S_SD_ERR)
                                         cmd8AskVoltageOk <= `Enabled;
                                 end
-                                sdState <= S_8CLK;
+                                sdState <= S_SD_8CLK;
                             end
 
                             2: // 倒数第二字节: 检查电压是否正常
                             begin
-                                if (iSpiRxData & 8'h0F != 8'h01) begin
+                                if ((iSpiRxData & 8'h0F) != 8'h01) begin
                                     oDebugInfoAvailable <= `True;
-                                    oDebugInfo <= {56'hFD, iSpiRxData};
-                                    nextState <= S_ERR;
+                                    oDebugInfo <= {56'hFDFE, iSpiRxData};
+                                    nextState <= S_SD_ERR;
                                 end
                             end
                         endcase
@@ -318,34 +355,34 @@ module sd_controller(
                     oSpiRxEn <= `Enabled;
                 end
 
-            S_SDINIT_PRE:
+            S_SD_SDINIT_PRE:
                 begin
                 // SEND CMD55 (APPCMD)
                     cmd55AppCommandOk <= `False;
                     command <= CMD55;
                     commandByteCounter <= LEN_CMD55;
-                    nextState <= S_SDINIT_CMD55_RESP_PRE;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_SDINIT_CMD55_RESP_PRE;
+                    sdState <= S_SD_TXCMD;
                 end
 
-            S_SDINIT_CMD55_RESP_PRE:
+            S_SD_SDINIT_CMD55_RESP_PRE:
                 begin
-                    nextState <= S_SDINIT_ACMD41_PRE;
-                    nextStateIfInvalid <= S_SDINIT_CMD55_INVALID;
-                    nextStateToRetry <= S_SDINIT_PRE;
+                    nextState <= S_SD_SDINIT_ACMD41_PRE;
+                    nextStateIfInvalid <= S_SD_SDINIT_CMD55_INVALID;
+                    nextStateToRetry <= S_SD_SDINIT_PRE;
                     expectedSpiRxData <= RESP_CMD55;
                     invalidSpiRxData <= RESP_CMD_ILLEGAL;
-                    sdState <= S_GENERAL_RESP_CHECK;
+                    sdState <= S_SD_GENERAL_RESP_CHECK;
                 end
 
-            S_SDINIT_CMD55_INVALID:
+            S_SD_SDINIT_CMD55_INVALID:
                 begin
                     oDebugInfoAvailable <= `True;
                     oDebugInfo <= {56'hED, 8'hCF};
-                    sdState <= S_ERR;
+                    sdState <= S_SD_ERR;
                 end
 
-            S_SDINIT_ACMD41_PRE:
+            S_SD_SDINIT_ACMD41_PRE:
                 begin
                     cmd55AppCommandOk <= `True;
                     retryACMD41Counter <= 0;
@@ -353,42 +390,42 @@ module sd_controller(
                     acmd41InitAbandoned <= `False;
                     command <= ACMD41;
                     commandByteCounter <= LEN_ACMD41;
-                    nextState <= S_SDINIT_ACMD41_RESP_PRE;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_SDINIT_ACMD41_RESP_PRE;
+                    sdState <= S_SD_TXCMD;
                 end
                     
-            S_SDINIT_ACMD41_RESP_PRE:
+            S_SD_SDINIT_ACMD41_RESP_PRE:
                 begin
-                    nextState <= S_READOCR_PRE;
-                    nextStateIfInvalid <= S_SDINIT_RETRY;
-                    nextStateToRetry <= S_SDINIT_PRE;
+                    nextState <= S_SD_READOCR_PRE;
+                    nextStateIfInvalid <= S_SD_SDINIT_RETRY;
+                    nextStateToRetry <= S_SD_SDINIT_PRE;
                     expectedSpiRxData <= RESP_ACMD41;
                     invalidSpiRxData <= RESP_ACMD41_INVALID;
-                    sdState <= S_GENERAL_RESP_CHECK;
+                    sdState <= S_SD_GENERAL_RESP_CHECK;
                 end
 
-            S_SDINIT_RETRY:
+            S_SD_SDINIT_RETRY:
                 begin
                     if(retryACMD41Counter == 1023) begin
                         acmd41InitAbandoned <= `True;
-                        sdState <= S_READOCR_PRE;
+                        sdState <= S_SD_READOCR_PRE;
                         retryACMD41Counter <= 0;
                     end else begin
-                        sdState <= S_SDINIT_PRE;
+                        sdState <= S_SD_SDINIT_PRE;
                         retryACMD41Counter <= retryACMD41Counter + 1;
                     end
                 end
 
-            S_READOCR_PRE:
+            S_SD_READOCR_PRE:
                 begin
                     acmd41InitOk <= `True;
                     command <= CMD58;
                     commandByteCounter <= LEN_CMD58;
-                    nextState <= S_READOCR_RESP_PRE;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_READOCR_RESP_PRE;
+                    sdState <= S_SD_TXCMD;
                 end
 
-            S_READOCR_RESP_PRE:
+            S_SD_READOCR_RESP_PRE:
                 begin
                     cmd58ReadOcrHaveGot <= `False;
                     cmd58ReadOcrCCS <= `False;
@@ -397,10 +434,10 @@ module sd_controller(
                     responseByteCounter <= 5;
                     responseStart <= `False;
                     waitSpiRxDataCounter <= 0;
-                    sdState <= S_READOCR_RESP_CHECK;
+                    sdState <= S_SD_READOCR_RESP_CHECK;
                 end
 
-            S_READOCR_RESP_CHECK:
+            S_SD_READOCR_RESP_CHECK:
                 if (iSpiRxOk) begin
                     oSpiRxEn <= `Disabled;
                     if(!responseStart) begin
@@ -409,17 +446,17 @@ module sd_controller(
                             if (iSpiRxData == RESP_LOWLEVEL) begin
                                 responseStart <= `True;
                             end else begin
-                                nextState <= S_ERR;
+                                nextState <= S_SD_ERR;
                                 oDebugInfoAvailable <= `Enabled;
                                 oDebugInfo[7:0] <= iSpiRxData;
                                 oDebugInfo[63:8] <= 56'hAA;
-                                sdState <= S_8CLK;
+                                sdState <= S_SD_8CLK;
                             end
                         end else if (waitSpiRxDataCounter == T_RESPMAXCNT) begin
                             oDebugInfoAvailable <= `Enabled;
-                            oDebugInfo[11:0] <= waitSpiRxDataCounter;
-                            oDebugInfo[63:12] <= {32'hCC, 8'hAA, nextState};
-                            sdState <= S_READOCR_PRE;
+                            oDebugInfo[15:0] <= waitSpiRxDataCounter;
+                            oDebugInfo[63:16] <= {32'hCC, 8'hAA, nextState};
+                            sdState <= S_SD_READOCR_PRE;
                         end else begin
                             waitSpiRxDataCounter <= waitSpiRxDataCounter + 1;
                         end
@@ -429,7 +466,7 @@ module sd_controller(
                             1:  // 最后一字节: 检查校验位
                             begin
                                 nextState <= nextState;
-                                sdState <= S_8CLK;
+                                sdState <= S_SD_8CLK;
                             end
 
                             4: // OCR 第一个字节
@@ -442,7 +479,7 @@ module sd_controller(
                                 cmd58ReadOcrCCS <= iSpiRxData[6];
 
                                 // 我们跳过 CMD6 (查询此卡是否允许提速).
-                                nextState <= S_IDLE;
+                                nextState <= S_SD_IDLE;
                             end
                         endcase
                     end
@@ -450,13 +487,13 @@ module sd_controller(
                     oSpiRxEn <= `Enabled;
                 end
 
-            S_GENERAL_RESP_CHECK:
+            S_SD_GENERAL_RESP_CHECK:
                 begin
                     waitSpiRxDataCounter <= 0;
-                    sdState <= S_GENERAL_RESP_CHECK_DO;
+                    sdState <= S_SD_GENERAL_RESP_CHECK_DO;
                 end
 
-            S_GENERAL_RESP_CHECK_DO:
+            S_SD_GENERAL_RESP_CHECK_DO:
             // 参数: nextState, nextStateIfInvalid, nextStateToRetry
             //      expectedSpiRxData, invalidSpiRxData
                 if (iSpiRxOk) begin
@@ -464,16 +501,16 @@ module sd_controller(
                     if(iSpiRxData != RESP_HIGHLEVEL) begin
                         if(iSpiRxData == expectedSpiRxData) begin
                             nextState <= nextState;
-                            sdState <= S_8CLK;
+                            sdState <= S_SD_8CLK;
                         end else if (iSpiRxData == invalidSpiRxData) begin
                             nextState <= nextStateIfInvalid;
-                            sdState <= S_8CLK;
+                            sdState <= S_SD_8CLK;
                         end else begin
                             oDebugInfoAvailable <= `Enabled;
                             oDebugInfo[7:0] <= iSpiRxData;
                             oDebugInfo[63:8] <= {40'h0, 8'hAB, nextState};
-                            nextState <= S_ERR;
-                            sdState <= S_8CLK;
+                            nextState <= S_SD_ERR;
+                            sdState <= S_SD_8CLK;
                         end
                     end else if (waitSpiRxDataCounter == T_RESPMAXCNT) begin
                         // 超时
@@ -489,21 +526,21 @@ module sd_controller(
                     oSpiRxEn <= `Enabled;
                 end
 
-            S_TXCMD:
+            S_SD_TXCMD:
                 begin
                     nextNextState <= nextState;
-                    nextState <= S_TXCMD_DO;
-                    sdState <= S_8CLK;
+                    nextState <= S_SD_TXCMD_DO;
+                    sdState <= S_SD_8CLK;
                     // 在传输前, 等待8个时钟周期
                 end
 
-            S_TXCMD_DO:
+            S_SD_TXCMD_DO:
                 begin
                     if(iSpiTxOk) begin
                         if(commandByteCounter <= 1)begin
                             commandByteCounter <= 0;
                             oSpiTxEn <= `Disabled;
-                            sdState <= S_8CLK;
+                            sdState <= nextState;
                         end else begin
                             oSpiTxEn <= `Enabled;
                             commandByteCounter <= commandByteCounter - 1;
@@ -511,11 +548,11 @@ module sd_controller(
                     end else begin
                         nextState <= nextNextState;
                         oSpiTxEn <= `Enabled;
-                        oSpiTxData <= command[(commandByteCounter << 3 - 1) -: 8];
+                        oSpiTxData <= command[((commandByteCounter << 3) - 1) -: 8];
                     end
                 end
 
-            S_8CLK:
+            S_SD_8CLK:
                 begin
                     if(iSpiClk8Ok) begin
                         oSpiClk8En <= `Disabled;
@@ -525,24 +562,24 @@ module sd_controller(
                     end
                 end
 
-            S_ERR:
+            S_SD_ERR:
                 begin
                     error <= `True;
                 end
 
-            S_IDLE:
+            S_SD_IDLE:
                 begin
                     if(iReadEn) begin
                         iReadSectorNumStored <= iReadSectorNum;
-                        sdState <= S_READ_PRE;
+                        sdState <= S_SD_READ_PRE;
                     end
                     oStartOk <= `True;
                 end
             
-            S_READ_PRE:
+            S_SD_READ_PRE:
                 begin
                     if(iReadSectorNumStored == 0)
-                        sdState <= S_IDLE;
+                        sdState <= S_SD_IDLE;
                     else if (iReadSectorNumStored == 1) begin
                         command <= {CMD17_H, cmd58ReadOcrCCS ? iReadAddr : (iReadAddr << 9), CMD17_T};
                     end else begin
@@ -550,38 +587,50 @@ module sd_controller(
                     end
 
                     commandByteCounter <= 7;
-                    nextState <= S_READ;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_READ;
+                    sdState <= S_SD_TXCMD;
+                    startBlockTokenReceived <= `False;
                 end
 
-            S_READ:
+            S_SD_READ:
                 begin
                     responseByteCounter <= 512 + 2; // CRC 校验码 2 字节
                     responseStart <= 0;
                     waitSpiRxDataCounter <= 0;
-                    sdState <= S_READ_DO;
+                    sdState <= S_SD_READ_DO;
+                    
                 end
 
-            S_READ_DO:
+            S_SD_READ_DO:
                 if(iSpiRxOk) begin
                     oSpiRxEn <= `False;
                     if (!responseStart) begin
                         if (iSpiRxData != RESP_HIGHLEVEL) begin
                             if (iSpiRxData == 8'hFE) begin
-                                responseStart <= `True;
+                                if(startBlockTokenReceived)
+                                    responseStart <= `True;
+                                else begin
+                                    oDebugInfoAvailable <= `Enabled;
+                                    oDebugInfo[7:0] <= iSpiRxData;
+                                    oDebugInfo[63:8] <= {40'h0,8'hED,8'h17};
+                                    nextState <= S_SD_ERR;
+                                    sdState <= S_SD_8CLK;
+                                end
+                            end else if (iSpiRxData == 8'h00) begin
+                                startBlockTokenReceived <= `True;
                             end else begin
                                 oDebugInfoAvailable <= `Enabled;
                                 oDebugInfo[7:0] <= iSpiRxData;
-                                oDebugInfo[63:8] <= {40'h0,tmp,8'h17};
-                                nextState <= S_ERR;
-                                sdState <= S_8CLK;
+                                oDebugInfo[63:8] <= {40'h0,8'hEC,8'h17};
+                                nextState <= S_SD_ERR;
+                                sdState <= S_SD_8CLK;
                             end
-                        end else if (waitSpiRxDataCounter == T_RESPMAXCNT) begin
+                        end else if (waitSpiRxDataCounter == T_RESPMAXCNT_READ) begin
                             oDebugInfoAvailable <= `Enabled;
                             oDebugInfo[7:0] <= iSpiRxData;
                             oDebugInfo[63:8] <= {48'hAA, 8'hEE};
-                            nextState <= S_ERR;
-                            sdState <= S_8CLK;
+                            nextState <= S_SD_ERR;
+                            sdState <= S_SD_8CLK;
                         end else begin
                             waitSpiRxDataCounter <= waitSpiRxDataCounter + 1;
                         end
@@ -598,61 +647,63 @@ module sd_controller(
                             if (command[7:0] == CMD18_T)
                             begin
                                 // 多扇区
-                                if (iReadSectorNumStored == 1)
+                                if (iReadSectorNumStored == 1) begin
                                     // 读完
+                                    nextState <= S_SD_MULTIREADDONE_PRE;
+                                    sdState <= S_SD_8CLK;
+                                end else begin
                                     iReadSectorNumStored <= iReadSectorNumStored - 1;
-                                    nextState <= S_MULTIREADDONE_PRE;
-                                    sdState <= S_CLK8;
-                                else
-                                    sdState <= S_READ;
+                                    sdState <= S_SD_READ;
+                                end
                             end else begin
-                                nextState <= S_AFTERREAD;
-                                sdState <= S_8CLK;
+                                nextState <= S_SD_MULTIREADDONE_POST;
+                                sdState <= S_SD_8CLK;
                             end
                         end
                     end
                 end else begin
                     oSpiRxEn <= `True;
+                end
             
-            S_MULTIREADDONE_PRE:
+            S_SD_MULTIREADDONE_PRE:
                 begin
                     command <= CMD12;
                     commandByteCounter <= LEN_CMD12;
-                    nextState <= S_MULTIREADDONE_PAUSE;
-                    sdState <= S_TXCMD;
+                    nextState <= S_SD_MULTIREADDONE_PAUSE;
+                    sdState <= S_SD_TXCMD;
                 end
 
-            S_MULTIREADDONE_PAUSE:
+            S_SD_MULTIREADDONE_PAUSE:
                 begin
-                    nextState <= S_MULTIREADDONE_RESP_PRE;
-                    sdState <= S_CLK8;
+                    nextState <= S_SD_MULTIREADDONE_RESP_PRE;
+                    sdState <= S_SD_8CLK;
                 end
 
-            S_MULTIREADDONE_RESP_PRE:
+            S_SD_MULTIREADDONE_RESP_PRE:
                 begin
                     waitSpiRxDataCounter <= 0;
-                    nextState <= S_MULTIREADDONE_RESP_ZERO;
-                    nextStateIfInvalid <= S_RESET;
-                    nextStateToRetry <= S_MULTIREADDONE_POST;   //长时间没有回应00，回复FF，也默认成功执行了
+                    nextState <= S_SD_MULTIREADDONE_RESP_ZERO;
+                    nextStateIfInvalid <= S_SD_MULTIREADDONE_RESP_ZERO;
+                    nextStateToRetry <= S_SD_MULTIREADDONE_POST;   //长时间没有回应00，回复FF，也默认成功执行了
 
                     expectedSpiRxData <= RESP_LOWLEVEL;
-                    invalidSpiRxData <= RESP_LOWLEVEL;  //和 expected 一致, 表示没有 invalid 分支
-                    sdState <= S_GENERAL_RESP_CHECK;
+                    invalidSpiRxData <= 8'h7F;  //7F 也可接受
+                    sdState <= S_SD_GENERAL_RESP_CHECK;
                 end
 
-            S_MULTIREADDONE_RESP_ZERO:
+            S_SD_MULTIREADDONE_RESP_ZERO:
                 begin
                     if (iSpiRxOk) begin
                         oSpiRxEn <= `Disabled;
                         if (iSpiRxData == RESP_HIGHLEVEL) begin
-                            nextState <= S_MULTIREADDONE_POST;
-                            sdState <= S_CLK8;
+                            nextState <= S_SD_MULTIREADDONE_POST;
+                            sdState <= S_SD_8CLK;
                         end else begin
                             if (waitSpiRxDataCounter == T_RESPMAXCNT) begin
                                 oDebugInfoAvailable <= `Enabled;
                                 oDebugInfo[7:0] <= iSpiRxData;
                                 oDebugInfo[63:8] <= {48'h0, 8'hAC};
-                                sdState <= S_ERR;
+                                sdState <= S_SD_ERR;
                             end else begin
                                 waitSpiRxDataCounter <= waitSpiRxDataCounter + 1;
                             end
@@ -662,19 +713,19 @@ module sd_controller(
                     end
                 end
 
-            S_MULTIREADDONE_POST:
+            S_SD_MULTIREADDONE_POST:
                 begin
                     oReadOk <= `Enabled;
-                    sdState <= S_MULTIREADDONE_POST_POST;
+                    sdState <= S_SD_MULTIREADDONE_POST_POST;
                 end
 
-            S_MULTIREADDONE_POST_POST:
+            S_SD_MULTIREADDONE_POST_POST:
                 begin
-                    sdState <= S_IDLE;
+                    sdState <= S_SD_IDLE;
                 end
             
             default:
-                sdState <= S_RESET;
+                sdState <= S_SD_RESET;
         endcase
     end
 endmodule

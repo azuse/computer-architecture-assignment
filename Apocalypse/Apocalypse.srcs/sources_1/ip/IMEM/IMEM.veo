@@ -55,11 +55,13 @@
 
 //----------- Begin Cut here for INSTANTIATION Template ---// INST_TAG
 IMEM your_instance_name (
-  .a(a),      // input wire [12 : 0] a
-  .d(d),      // input wire [31 : 0] d
-  .clk(clk),  // input wire clk
-  .we(we),    // input wire we
-  .spo(spo)  // output wire [31 : 0] spo
+  .a(a),        // input wire [12 : 0] a
+  .d(d),        // input wire [31 : 0] d
+  .dpra(dpra),  // input wire [12 : 0] dpra
+  .clk(clk),    // input wire clk
+  .we(we),      // input wire we
+  .spo(spo),    // output wire [31 : 0] spo
+  .dpo(dpo)    // output wire [31 : 0] dpo
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------
 

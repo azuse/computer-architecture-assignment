@@ -11,9 +11,11 @@ module regfile #(
     input cpuPaused,
     input [numlog-1:0] raddr1,
     input [numlog-1:0] raddr2,
+    input [numlog-1:0] debugRFAddr,
     input [numlog-1:0] waddr,
     output [width-1:0] rdata1,
     output [width-1:0] rdata2,
+    output [width-1:0] debugRFData,
     input [width-1:0] wdata
     );
 
@@ -21,6 +23,7 @@ module regfile #(
 
     assign rdata1 = array_reg[raddr1];
     assign rdata2 = array_reg[raddr2];
+    assign debugRFData = array_reg[debugRFAddr];
 
     integer j;
     always @(posedge clk)

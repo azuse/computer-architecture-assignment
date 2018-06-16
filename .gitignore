@@ -8,5 +8,7 @@
 **/~$*.do[ct]
 **/~$*.do[ct]?
 **/~WRL*.tmp
+**/timing/
+**/msim/
 _gsdata_/
 gitlog.log

@@ -6,7 +6,7 @@ module CLZAlgorithm(
     output busy
 );
     reg lastEna;
-    (* dont_touch = "yes" *) reg [7:0] counter;
+    reg [7:0] counter;
     localparam COUNTER_CYCLE = 25;
 
     always @(posedge clk) begin

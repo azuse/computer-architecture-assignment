@@ -14,6 +14,8 @@ module nyarlathotep(
 
     input [31:0] dmemAOut,
 
+    input [4:0] debugRFAddr,
+
     output reg dmemAEn,
     output [3:0] dmemAWe,
     output reg [31:0] dmemAAddr,
@@ -25,14 +27,16 @@ module nyarlathotep(
 
     output [31:0] imemWAddr,
     output [31:0] imemWData,
-    output imemWe
+    output imemWe,
+
+    output [31:0] debugRFData
 );
     assign imemWAddr = 32'h0;
     assign imemWData = 32'h0;
     assign imemWe = `DISABLE;
     
     reg cpuStarted;
-    assign cpuRunning = cpuStarted;
+    assign cpuRunning = (ena & cpuStarted);
     wire cpuPaused;
 
     `include "aluHeader.vh"
@@ -59,7 +63,9 @@ module nyarlathotep(
         .waddr(rfWAddr),
         .rdata1(rfRData1),
         .rdata2(rfRData2),
-        .wdata(rfWData)
+        .wdata(rfWData),
+        .debugRFAddr(debugRFAddr),
+        .debugRFData(debugRFData)
     );
 
     /// ALU
@@ -279,7 +285,7 @@ module nyarlathotep(
         end
         else
         begin
-            if(cpuStarted == `DISABLE) begin
+            if(cpuStarted == `DISABLE && ena) begin
                 if(startCounter == startNo - 1) begin
                     cpuStarted <= `ENABLE;
                 end
