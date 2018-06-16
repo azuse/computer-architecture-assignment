@@ -23,11 +23,9 @@
 module test(
 
     );
-    reg [5:0] counter = 0;
-    reg [5:0] imm;
-    always @(*)
+    reg [63:0] str;
+    initial
     begin
-        imm = ~counter;
-        counter = ~imm + 1;
+        str = "HELLOWLD";
     end
 endmodule

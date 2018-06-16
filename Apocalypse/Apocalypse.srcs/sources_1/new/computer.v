@@ -1,22 +1,26 @@
-
-`define Enabled 1'b1
-`define Disabled 1'b0
+`timescale 1ns/1ns
+`include "sdHeader.vh"
 
 module computer(
     input clk_in,
     input reset,
-    input cpuEna,
-    input ioSelEna,
+    input cpuStart,
     input [12:0] debugDMEMAddr,
     input [12:0] debugIMEMAddr,
     input [4:0] debugRFAddr,
-    input [15:0] SW_stored_input,
 
     output clk_cpu,
     output [31:0] inst,
     output [31:0] pc,
     output [31:0] addr,
+    output [7:0] blState,
+    output [7:0] sdState,
+    output [31:0] debugInfo,
+    output debugInfoAvailable,
+
     output cpuRunning,
+    output sdError,
+    output blError,
     output [31:0] debugDMEMData,
     output [31:0] debugIMEMData,
     output [31:0] debugRFData,
@@ -156,38 +160,6 @@ module computer(
     );
 
     //////////////
-    /// I/O Selector
-    /// When DMEM read address becomes some certain values, enables seg7_ChipSelect(to make dmemAIn displayed on LED) or switch_ChipSelect signals(to select dmemAOut_Selected as the input of 15 switches rather than default DMEM output).
-
-    wire ioSelector_Ena = ioSelEna;
-
-    wire seg7_cs;
-    wire switch_cs;
-    
-    
-
-    io_sel ioselector_signalgen(
-        .addr(dmemAAddr),
-        .cs(ioSelector_Ena),
-        .sig_w(dmemAWe[3] & dmemAWe[2] & dmemAWe[1] & dmemAWe[0]),
-        .sig_r(dmemAEn & ~(dmemAWe[3] & dmemAWe[2] & dmemAWe[1] & dmemAWe[0])),
-        .seg7_cs(seg7_cs),
-        .switch_cs(switch_cs)
-    );
-
-    ////////////////////
-    /// Output device - seg7x16
-    /// when seg7_cs is on, latches i_data and encodes it to seven-segment display signals to o_seg and o_sel.
-
-    sevenSegSelector sevenSeg_inst(
-        .clk(clk_cpu),
-        .reset(reset),
-        .cs(seg7_cs),
-        .i_data(dmemAIn),
-        .o_data(sevenSegOut)
-    );
-
-    //////////////
     /// CPU Instantiation
     nyarlathotep sccpu(
         .clk(clk_cpu),
@@ -197,8 +169,7 @@ module computer(
         .dmemAWe(dmemAWe),
         .dmemAAddr(dmemAAddr),
         .dmemAIn(dmemAIn),
-        .dmemAOut((dmemAAddr == 32'h10010010 && ioSelector_Ena && dmemAEn) ? (SW_stored_input) : dmemAOut),
-        //.dmemAOut(dmemAOut),
+        .dmemAOut(dmemAOut),
         .cpuRunning(cpuRunning),
         .pc(imemRAddr),
         .inst(imemOut),
@@ -208,36 +179,4 @@ module computer(
         .debugRFAddr(debugRFAddr),
         .debugRFData(debugRFData)
     );
-endmodule
-
-module io_sel(
-    input [31:0] addr,
-    input cs,
-    input sig_w,
-    input sig_r,
-    output seg7_cs,
-    output switch_cs
-);
-    assign seg7_cs = (addr == 32'h10010000 && cs == 1 && sig_w == 1) ? 1 : 0;
-    assign switch_cs = (addr == 32'h10010010 && cs == 1 && sig_r == 1) ? 1 : 0;
-endmodule
-
-module sevenSegSelector(
-    input clk,
-    input reset,
-    input cs,
-    input [31:0] i_data,
-    output [31:0] o_data
-);
-
-    reg [31:0] i_data_store;
-
-    always @ (posedge clk)
-    if(reset)
-        i_data_store <= 0;
-    else if(cs)
-        i_data_store <= i_data;
-        
-    assign o_data = i_data_store;
-
 endmodule

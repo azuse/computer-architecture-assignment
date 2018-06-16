@@ -12,11 +12,24 @@ module debugInfo(
     input [7:0] sdState,
     input [31:0] debugInfo,
     input debugInfoAvailable,
+    input [31:0] debugDMEMData,
+    input [31:0] debugIMEMData,
+    input [31:0] debugRFData,
+
+    output [12:0] debugDMEMAddr,
+    output [12:0] debugIMEMAddr,
+    output [4:0] debugRFAddr,
+
     output [15:0] LED,
     output reg [31:0] sevenSegOut
 );
 
     wire latch_n = SW[1];
+
+    assign LED[0] = ~latch_n;
+    assign debugDMEMAddr = {5'h0, SW[15:8]};
+    assign debugIMEMAddr = {5'h0, SW[15:8]};
+    assign debugRFAddr = SW[12:8];
 
     reg [31:0] instructionHistory [0:7];
     reg [31:0] regHistory [0:7];
@@ -31,14 +44,14 @@ module debugInfo(
     always @(posedge clk_cpu)
     begin
         if (reset) begin
-            for (i = 0; i < 8; i++) begin
+            for (i = 0; i < 8; i=i+1) begin
                 instructionHistory[i] <= 0;
                 regHistory[i] <= 0;
             end
         end else begin
             if (~latch_n) begin
                 if(regHistory[0] != pc) begin
-                    for (i = 0; i < 8; i++) begin
+                    for (i = 0; i < 8; i=i+1) begin
                         regHistory[i + 1] <= regHistory[i];
                         instructionHistory[i + 1] <= regHistory[i];
                     end
@@ -55,7 +68,7 @@ module debugInfo(
         if (reset) begin
             blStateHistory <= 0;
             sdStateHistory <= 0;
-            for (i = 0; i < 8; i++) begin
+            for (i = 0; i < 8; i=i+1) begin
                 debugInfoHistory[i] <= 0;
             end
         end else begin
@@ -68,7 +81,7 @@ module debugInfo(
 
                 if(debugInfoAvailable)
                 begin
-                    for (i = 0; i < 8; i++) begin
+                    for (i = 0; i < 8; i=i+1) begin
                         debugInfoHistory[i + 1] <= debugInfoHistory[i];
                     end
                     debugInfoHistory[0] <= debugInfo;
@@ -83,15 +96,17 @@ module debugInfo(
             0:
                 sevenSegOut = regHistory[SW[10:8]];
             1:
-                sevenSegOut = sevenSegOut_cpu;
+                sevenSegOut = instructionHistory[SW[10:8]];
             2:
                 sevenSegOut = debugDMEMData;
             3:
-                sevenSegOut = debugRFData;
+                sevenSegOut = debugIMEMData;
             4:
-                sevenSegOut = sdStateHistory;
+                sevenSegOut = debugRFData;
             5:
-                sevenSegOut = debugInfo[0];
+                sevenSegOut = sdStateHistory;
+            6:
+                sevenSegOut = debugInfo[SW[10:8]];
             default:
                 sevenSegOut = 'hFFFFFFFF;
         endcase
