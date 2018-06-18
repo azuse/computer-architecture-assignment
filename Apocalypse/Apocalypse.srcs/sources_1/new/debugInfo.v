@@ -8,8 +8,12 @@ module debugInfo(
     input [15:0] SW,
     input [31:0] pc,
     input [31:0] instruction,
+    input cpuRunning,
+    input cpuPaused,
     input [7:0] blState,
     input [7:0] sdState,
+    input blError,
+    input sdError,
     input [31:0] debugInfo,
     input debugInfoAvailable,
     input [31:0] debugDMEMData,
@@ -26,14 +30,21 @@ module debugInfo(
 
     wire latch_n = SW[1];
 
-    assign LED[0] = ~latch_n;
+    assign LED[0] = cpuRunning;
+    assign LED[1] = cpuPaused;
+    assign LED[2] = ~latch_n;
+    assign LED[3] = debugInfoAvailable;
+    assign LED[4] = reset;
+    assign LED[5] = clk_cpu;
+    assign LED[15] = blError;
+    assign LED[14] = sdError;
     assign debugDMEMAddr = {5'h0, SW[15:8]};
     assign debugIMEMAddr = {5'h0, SW[15:8]};
     assign debugRFAddr = SW[12:8];
 
     reg [31:0] instructionHistory [0:7];
     reg [31:0] regHistory [0:7];
-    reg [31:0] debugInfoHistory [0:7];
+    reg [31:0] debugInfoHistory [0:31];
 
     reg [31:0] blStateHistory;
     reg [31:0] sdStateHistory;
@@ -51,7 +62,7 @@ module debugInfo(
         end else begin
             if (~latch_n) begin
                 if(regHistory[0] != pc) begin
-                    for (i = 0; i < 8; i=i+1) begin
+                    for (i = 0; i < 7; i=i+1) begin
                         regHistory[i + 1] <= regHistory[i];
                         instructionHistory[i + 1] <= regHistory[i];
                     end
@@ -63,12 +74,12 @@ module debugInfo(
         end
     end
 
-    always @(posedge CLK100MHZ)
+    always @(posedge clk_cpu)
     begin
         if (reset) begin
             blStateHistory <= 0;
             sdStateHistory <= 0;
-            for (i = 0; i < 8; i=i+1) begin
+            for (i = 0; i < 32; i=i+1) begin
                 debugInfoHistory[i] <= 0;
             end
         end else begin
@@ -81,7 +92,7 @@ module debugInfo(
 
                 if(debugInfoAvailable)
                 begin
-                    for (i = 0; i < 8; i=i+1) begin
+                    for (i = 0; i < 31; i=i+1) begin
                         debugInfoHistory[i + 1] <= debugInfoHistory[i];
                     end
                     debugInfoHistory[0] <= debugInfo;
@@ -106,7 +117,9 @@ module debugInfo(
             5:
                 sevenSegOut = sdStateHistory;
             6:
-                sevenSegOut = debugInfo[SW[10:8]];
+                sevenSegOut = blStateHistory;
+            7:
+                sevenSegOut = debugInfoHistory[SW[12:8]];
             default:
                 sevenSegOut = 'hFFFFFFFF;
         endcase

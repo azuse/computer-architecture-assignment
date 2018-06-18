@@ -1,15 +1,19 @@
 `timescale 1ns/1ns
 `include "sdHeader.vh"
-`define Root 1'b0
-`define File 1'b1
+`define Root 2'h0
+`define File 2'h1
+`define Executable 2'h2
+`define Background 2'h3
 
 module bootloader(
     input clk,
     input reset,
 
-    input en,
+    input iEn,
+    output reg oBootLoadOk,
+    output reg blWorking,
+
     input sdIdle,
-    
     output reg sdStartEn,
     output reg sdReadEn,
     output reg [31:0] sdReadAddr,
@@ -20,24 +24,53 @@ module bootloader(
     input sdReadDataValid,
     input sdReadDataASectorDone,
 
-    input iGetFileEn,
+    output reg imemWe,
+    output reg [31:0] imemWAddr,
+    output reg [31:0] imemWData,
 
-    input [63:0] iGetFileName,
+    output reg [3:0] dmemAWe,
+    output reg dmemAEn,
+    output reg [31:0] dmemAAddr,
+    output reg [31:0] dmemAIn,
+    
 
-    output reg oGetFileOk,
+    input iLoadExecutableEn,
+    input [87:0] iLoadExecutableName,
+    input [31:0] iLoadExecutableIMEMAddr,
+    output reg oLoadExecutableOk,
 
+    input [31:0] iWordLimit,
+    input [31:0] iWordOffset,
+
+    input iLoadFileEn,
+    input [87:0] iLoadFileName,
+    input [31:0] iLoadFileDMEMAddr,
+    output reg oLoadFileOk,
+
+    input iLoadBackgroundFileEn,
+    output reg oLoadBackgroundFileOk,
+
+    output reg backgroundMemWea,
+    output reg [15:0] backgroundMemAddra,
+    output reg [11:0] backgroundMemDina,
+
+    output reg [7:0] blState,
+    output reg blError,
     output reg [31:0] debugInfo,
-    output reg debugInfoAvailable,
-    output ok
+    output reg debugInfoAvailable
 );
 
-    localparam S_BL_RESET = 8'hFF;
-    localparam S_BL_INIT = 8'h00;
-    localparam S_BL_SDSTART = 8'h00;
-    localparam N_BL_INITSCRIPT = "APOCLYPS";
+    localparam initInstAddr = 32'h00400000;
+    localparam initDataAddr = 32'h10010000;
+    localparam exceptionEntry = 32'h00400004;
+
+    `include "blStates.vh"
+
+    localparam N_BL_INITSCRIPT = "APOCLYPSBIN";
+    
     
     reg tmpError;
-    reg [7:0] blState;
+    
 
     reg [10:0] readByteCounter;
     reg [31:0] readSectorCounter;
@@ -48,7 +81,68 @@ module bootloader(
 
     reg isFdd;
 
-    reg [63:0] getFileName;
+    reg [87:0] loadExecutableName;
+    reg [31:0] loadExecutableIMEMAddr;
+    reg [87:0] loadFileName;
+    reg [31:0] loadFileDMEMAddr;
+    reg [31:0] wordLimit;
+    reg [31:0] wordOffset;
+
+    reg [1:0] executableOrFile;
+
+    reg rootClusMemWe;
+    reg [7:0] rootClusMemDina;
+    reg [14:0] rootClusMemAddra;
+    wire [7:0] rootClusMemDoutb;
+    reg [14:0] rootClusMemAddrb;
+
+    reg [5:0] BPB_SecPerClus_log2;
+    reg [15:0] BPB_RsvdSecCnt;
+    reg [7:0] BPB_NumFATs;
+    reg [31:0] BPB_FATSz32;
+    reg [31:0] BPB_RootClusNum;
+
+    reg [31:0] currRootFATSecNum;
+    reg [31:0] currFileFATSecNum;
+    reg [31:0] currRootClusNum;
+
+    wire [31:0] fatSecNum = dbrAddr + BPB_RsvdSecCnt;
+    wire [31:0] firstClusSec = fatSecNum + BPB_NumFATs * BPB_FATSz32;
+    wire [5:0] clusSize_log2 = BPB_SecPerClus_log2 + 9;
+    wire [5:0] dirItemsPerClus_log2 = clusSize_log2 - 5;
+
+    reg [10:0] dirItemIndex;
+    reg [7:0] scanRootState;
+    reg [31:0] currFileClusNum;
+    reg [31:0] currFileSectorCounter;
+    reg [87:0] currFileName;
+    reg [31:0] currFileSize;
+
+    reg [1:0] clusNumUse;
+
+    reg [31:0] nextClusNum;
+
+    reg [7:0] nextState;
+    reg [7:0] nextNextState;
+
+    reg [31:0] fatClusAddr;
+
+    reg [7:0] rootFATSector [0:511];
+    reg [7:0] fileFATSector [0:511];
+
+    reg [31:0] memWord;
+    reg [1:0] memByteCount;
+    reg [15:0] memWordCount;
+
+    root_cluster root_cluster_inst (
+        .clka(clk),
+        .wea(rootClusMemWe),
+        .addra(rootClusMemAddra),
+        .dina(rootClusMemDina),
+        .clkb(clk),
+        .addrb(rootClusMemAddrb),
+        .doutb(rootClusMemDoutb)
+    );
 
     always @(posedge clk)
     begin
@@ -58,21 +152,107 @@ module bootloader(
         if (rootClusMemWe)
             rootClusMemWe <= `Disabled;
 
-        if(reset || S_BL_RESET) begin
-           blState <= S_BL_INIT;
-           sdStartEn <= `Disabled;
-           sdReadEn <= `Disabled;
-           tmpError <= `False;
-           
+        if (imemWe)
+            imemWe <= `Disabled;
+        
+        if (dmemAEn)
+            dmemAEn <= `Disabled;
+
+        if (dmemAWe)
+            dmemAWe <= 4'h0;
+
+        if (backgroundMemWea)
+            backgroundMemWea <= `Disabled;
+
+        if (oLoadExecutableOk)
+            oLoadExecutableOk <= `False;
+
+        if (oLoadFileOk)
+            oLoadFileOk <= `False;
+
+        if (oLoadBackgroundFileOk)
+            oLoadBackgroundFileOk <= `False;
+
+
+        if(reset || blState == S_BL_RESET) begin
+            blState <= S_BL_INIT;
+            sdStartEn <= `Disabled;
+            sdReadEn <= `Disabled;
+            imemWe <= `Disabled;
+
+            oBootLoadOk <= `False;
+            sdReadAddr <= 0;
+            sdReadSectorNum <= 0;
+            imemWAddr <= 0;
+            imemWData <= 0;
+            dmemAWe <= 0;
+            dmemAEn <= `Disabled;
+            dmemAAddr <= 0;
+            dmemAIn <= 0;
+
+            oLoadExecutableOk <= `False;
+            oLoadFileOk <= `False;
+            oLoadBackgroundFileOk <= `False;
+            blError <= `False;
+
+            debugInfoAvailable <= `False;
+            tmpError <= `False;
+
+            readByteCounter <= 0;
+            readSectorCounter <= 0;
+
+            mbrHeader <= 0;
+            dbrAddr <= 0;
+            isFdd <= `False;
+            loadExecutableName <= 0;
+            loadExecutableIMEMAddr <= 0;
+            loadFileName <= 0;
+            loadFileDMEMAddr <= 0;
+            wordLimit <= 0;
+            wordOffset <= 0;
+            executableOrFile <= 0;
+
+            rootClusMemWe <= `Disabled;
+            rootClusMemDina <= 0;
+            rootClusMemAddra <= 0;
+            rootClusMemAddrb <= 0;
+
+            BPB_SecPerClus_log2 <= 0;
+            BPB_RsvdSecCnt <= 0;
+            BPB_NumFATs <= 0;
+            BPB_FATSz32 <= 0;
+            BPB_RootClusNum <= 0;
+
+            currRootFATSecNum <= 0;
+            currFileFATSecNum <= 0;
+            currRootClusNum <= 0;
+
+            dirItemIndex <= 0;
+            scanRootState <= 0;
+            currFileClusNum <= 0;
+            currFileName <= 0;
+
+            clusNumUse <= 0;
+            nextClusNum <= 0;
+            nextState <= 0;
+            nextNextState <= 0;
+            fatClusAddr <= 0;
+            memWord <= 0;
+            memByteCount <= 0;
+            memWordCount <= 0;
+
+            blWorking <= `False;
+
         end else case(blState)
             S_BL_INIT:
             begin
-                if (en) begin
+                if (iEn) begin
                     blState <= S_BL_SDSTART;
+                    blWorking <= `True;
                 end
             end
 
-            S_BL_START:
+            S_BL_SDSTART:
             begin
                 if(sdStartOk) begin
                     blState <= S_BL_READSECTOR0_PRE;
@@ -92,7 +272,7 @@ module bootloader(
                     sdReadEn <= `Enabled;
                     blState <= S_BL_READSECTOR0;
                     tmpError <= `False;
-                    isFdd <= `False;`
+                    isFdd <= `False;
                 end else if (~sdStartOk)
                     blState <= S_BL_RESET;
             end
@@ -109,10 +289,6 @@ module bootloader(
 
             end else if (sdReadDataValid) begin
                 readByteCounter <= readByteCounter + 1;
-                if(sdReadDataASectorDone) begin
-                    readByteCounter <= 0;
-                    readSectorCounter <= readSectorCounter + 1;
-                end
                 
                 if(!tmpError) begin
                     if(readByteCounter < 2) begin
@@ -138,6 +314,9 @@ module bootloader(
                         dbrAddr[((readByteCounter - 'h1C6) << 3 ) +: 8] <= sdReadData;
                     end 
                 end
+            end else if(sdReadDataASectorDone) begin
+                readByteCounter <= 0;
+                readSectorCounter <= readSectorCounter + 1;
             end
 
             S_BL_READDBR_PRE:
@@ -155,19 +334,19 @@ module bootloader(
                 if (sdReadOk) begin
                     sdReadEn <= `Disabled;
                     if(!tmpError) begin
-                        getFileName <= N_BL_INITSCRIPT;
+                        loadExecutableName <= N_BL_INITSCRIPT;
+                        loadExecutableIMEMAddr <= initInstAddr;
+                        wordLimit <= 8192;
+                        wordOffset <= 0;
+                        executableOrFile <= `Executable;
                         blState <= S_BL_READROOTCLUS_PRE;
-                        debugInfo <= BPB_FATSz32;
+                        debugInfo <= {8'hEC, BPB_FATSz32[23:0]};
                         debugInfoAvailable <= `True;
                     end else begin
                         blState <= S_BL_ERROR;
                     end
                 end else if (sdReadDataValid) begin
                     readByteCounter <= readByteCounter + 1;
-                    if(sdReadDataASectorDone) begin
-                        readByteCounter <= 0;
-                        readSectorCounter <= readSectorCounter + 1;
-                    end
                     
                     if(!tmpError) begin
                         if(readByteCounter == 13) begin
@@ -181,7 +360,7 @@ module bootloader(
                                 64:BPB_SecPerClus_log2 <= 6;
                                 default:begin
                                     debugInfo <= {24'hDC, sdReadData};
-                                    debugInfoAvailable <= 1;
+                                    debugInfoAvailable <= `True;
                                     tmpError <= `True;
                                 end
                             endcase
@@ -197,16 +376,18 @@ module bootloader(
                             BPB_RootClusNum[((readByteCounter - 44) << 3) +: 8] <= sdReadData;
                         end
                     end
+                end else if(sdReadDataASectorDone) begin
+                    readByteCounter <= 0;
+                    readSectorCounter <= readSectorCounter + 1;
                 end
 
-            S_BL_READROOTCLUS_PRE:
+            S_BL_READROOTCLUS_PRE, S_BL_LOAD:
                 begin
                     currRootFATSecNum <= 32'hFFFFFFFF;
                     currFileFATSecNum <= 32'hFFFFFFFF;
                     currRootClusNum <= BPB_RootClusNum;
                     debugInfo <= {2'b10, BPB_SecPerClus_log2, BPB_RsvdSecCnt, BPB_NumFATs};
                     debugInfoAvailable <= `True;
-
                     
                     blState <= S_BL_READROOTCLUS_INVOKE;
                 end
@@ -226,23 +407,28 @@ module bootloader(
                 if (sdReadOk) begin
                     rootClusMemWe <= `Disabled;
                     sdReadEn <= `Disabled;
+                    rootClusMemAddrb <= 'h10;
                     blState <= S_BL_SCANROOT_PRE;
                 end else if (sdReadDataValid) begin
                     readByteCounter <= readByteCounter + 1;
-                    if (sdReadDataASectorDone) begin
-                        readByteCounter <= 0;
-                        readSectorCounter <= readSectorCounter + 1;
-                    end
+                    
                     rootClusMemWe <= `Enabled;
                     rootClusMemAddra <= (readSectorCounter << 9) | readByteCounter;
                     rootClusMemDina <= sdReadData;
+                    if (readSectorCounter <= 1 && readByteCounter < 8) begin
+                        debugInfo <= {16'hC7C7, readByteCounter[7:0],sdReadData};
+                        debugInfoAvailable <= `True;
+                    end
+                end else if (sdReadDataASectorDone) begin
+                    readByteCounter <= 0;
+                    readSectorCounter <= readSectorCounter + 1;
                 end
 
             S_BL_SCANROOT_PRE:
                 begin
                     dirItemIndex <= 0;
                     scanRootState <= 0;
-                    debugInfo <= sdReadAddr;
+                    debugInfo <= {8'hED, sdReadAddr[23:0]};
                     debugInfoAvailable <= `True;
 
                     blState <= S_BL_SCANROOT_DO;
@@ -267,6 +453,10 @@ module bootloader(
                         0:
                         begin
                             rootClusMemAddrb <= (dirItemIndex << 5) + 26;
+                            if(dirItemIndex == 0)begin
+                                debugInfo <= {24'hE7, rootClusMemDoutb};
+                                debugInfoAvailable <= `True;
+                            end
                         end
 
                         1,2,3,4,5:
@@ -294,7 +484,7 @@ module bootloader(
                             end
                         end
 
-                        7,8,9,10,11,12,13,14,15:
+                        7,8,9,10,11,12,13,14,15,16,17,18:
                         begin
                             rootClusMemAddrb <= rootClusMemAddrb + 1;
                             if(scanRootState == 7) begin
@@ -302,33 +492,53 @@ module bootloader(
                             end else begin
                                 // Big Endian
                                 // Upper Case
-                                currFileName[((15 - scanRootState) << 3) +: 8] <= ((rootClusMemDoutb >= 'h61 && rootClusMemDoutb <= 'h7a) ? (rootClusMemDoutb - 'h20) : rootClusMemDoutb);
+                                currFileName[((18 - scanRootState) << 3) +: 8] <= ((rootClusMemDoutb >= 'h61 && rootClusMemDoutb <= 'h7a) ? (rootClusMemDoutb - 'h20) : rootClusMemDoutb);
                             end
                         end
                         
-                        16:
+                        19:
                         begin
-                            if (currFileName == getFileName) begin
+                            if (currFileName == ((executableOrFile == `Executable) ? loadExecutableName : loadFileName)) begin
+                                debugInfo <= currFileName[31:0];
+                                debugInfoAvailable <= `True;
                                 rootClusMemAddrb <= (dirItemIndex << 5) + 11;
                             end else begin
-                                debugInfo <= currFileName[32:0];
+                                debugInfo <= currFileName[31:0];
                                 debugInfoAvailable <= `True;
                                 blState <= S_BL_SCANROOT_INCREMENT;
                             end
                         end
                         
-                        17:
+                        20:
                         ;
 
-                        18:
+                        21:
                         begin
                             if((rootClusMemDoutb & 8'h0F) == 8'h0F) begin
                                 debugInfo <= {{3{8'hA2}}, rootClusMemDoutb};
                                 debugInfoAvailable <= `True;
                                 blState <= S_BL_SCANROOT_INCREMENT;
                             end else begin
-                                blState <= S_BL_READTEXTCLUS;
+                                rootClusMemAddrb <= (dirItemIndex << 5) + 28;
                             end
+                        end
+
+                        22:
+                        rootClusMemAddrb <= rootClusMemAddrb + 1;
+
+                        23,24,25,26:
+                        begin
+                            rootClusMemAddrb <= rootClusMemAddrb + 1; 
+                            currFileSize[((scanRootState - 23) << 3) +: 8] <= rootClusMemDoutb;
+                        end
+
+                        27:
+                        if (currFileSize == 0) begin
+                            debugInfo <= currFileSize;
+                            debugInfoAvailable <= `True;
+                            blState <= S_BL_SCANROOT_INCREMENT;
+                        end else begin
+                            blState <= S_BL_READFILECLUS_PRE_JUMPCLUS;
                         end
                     endcase
                 end
@@ -338,6 +548,21 @@ module bootloader(
                     nextState <= S_BL_GETNEXTROOTCLUS_POST;
                     clusNumUse <= `Root;
                     blState <= S_BL_GETNEXTCLUSNUM;
+                end
+
+            S_BL_GETNEXTROOTCLUS_POST:
+                begin
+                    //debugInfo <= {8'hB9, nextClusNum[23:0]};
+                    //debugInfoAvailable <= `True;
+
+                    if (nextClusNum[30:0] != 31'hfffffff) begin
+                        currRootClusNum <= nextClusNum;
+                        blState <= S_BL_READROOTCLUS_INVOKE;
+                    end else begin
+                        debugInfo <= {8'hBA, nextClusNum[23:0]};
+                        debugInfoAvailable <= `True;
+                        blState <= S_BL_ERROR;
+                    end
                 end
 
             S_BL_GETNEXTCLUSNUM:
@@ -353,10 +578,10 @@ module bootloader(
                     end
                 end
 
-            S_BL_GETNEXTCLUSNUM:
+            S_BL_GETNEXTCLUSNUM_POST:
                 begin
-                    debugInfo <= {8'hB5, fatClusAddr[23:0]};
-                    debugInfoAvailable <= `True;
+                    //debugInfo <= {8'hB5, fatClusAddr[23:0]};
+                    //debugInfoAvailable <= `True;
                     
                     if(clusNumUse == `File) begin
                         nextClusNum <= {fileFATSector[((currFileClusNum << 2) & 9'b111111111) + 3], fileFATSector[((currFileClusNum << 2) & 9'b111111111) + 2], fileFATSector[((currFileClusNum << 2) & 9'b111111111) + 1], fileFATSector[(currFileClusNum << 2) & 9'b111111111]};
@@ -385,20 +610,206 @@ module bootloader(
                     sdReadEn <= `Disabled;
                 end else if (sdReadDataValid) begin
                     readByteCounter <= readByteCounter + 1;
-                    if (sdReadDataASectorDone) begin
-                        readByteCounter <= 0;
-                        readSectorCounter <= readSectorCounter + 1;
-                    end
+                    
 
                     if (clusNumUse == `File)
                         fileFATSector[readByteCounter] <= sdReadData;
                     else
                         rootFATSector[readByteCounter] <= sdReadData;
+                end else if (sdReadDataASectorDone) begin
+                    readByteCounter <= 0;
+                    readSectorCounter <= readSectorCounter + 1;
+                end
+
+            S_BL_READFILECLUS_PRE_JUMPCLUS:
+                begin
+                    readSectorCounter <= 0;
+                    currFileSectorCounter <= 0;
+                    memWordCount <= 0;
+                    blState <= S_BL_READFILECLUS_PRE_JUMPCLUS_CHECK;
+                end
+
+            S_BL_READFILECLUS_PRE_JUMPCLUS_CHECK:
+                begin
+                    if (((wordOffset >> 7) >> BPB_SecPerClus_log2) != (currFileSectorCounter >> BPB_SecPerClus_log2)) begin
+                        nextState <= S_BL_READFILECLUS_PRE_JUMPCLUS_POST;
+                        clusNumUse <= `File;
+                        blState <= S_BL_GETNEXTCLUSNUM;
+                    end else begin
+                        blState <= S_BL_READFILECLUS_PRE;
+                    end
+                end
+
+            S_BL_READFILECLUS_PRE_JUMPCLUS_POST:
+                if (nextClusNum[30:0] != 31'hfffffff) begin
+                    debugInfo <= {8'h6E, currFileSectorCounter[23:0]};
+                    debugInfoAvailable <= `True;
+
+                    currFileClusNum <= nextClusNum;
+                    currFileSectorCounter <= currFileSectorCounter + (1 << BPB_SecPerClus_log2);
+
+                    blState <= S_BL_READFILECLUS_PRE_JUMPCLUS_CHECK;
+                end else begin
+                    debugInfo <= {8'h6D, currFileSectorCounter[23:0]};
+                    debugInfoAvailable <= `True;
+                    blState <= S_BL_ERROR;
+                end
+
+            // currFileSectorCounter: ±¸·Ý readSectorCounter
+            S_BL_READFILECLUS_PRE:
+                begin
+                    sdReadEn <= `Enabled;
+                    readByteCounter <= 0;
+                    readSectorCounter <= currFileSectorCounter;
+                    sdReadSectorNum <= (1 << BPB_SecPerClus_log2);
+                    sdReadAddr <= ((currFileClusNum - 2) << BPB_SecPerClus_log2) + firstClusSec;
+                    memWord <= 0;
+                    memByteCount <= 0;
+                    blState <= S_BL_READFILECLUS;
+                end
+
+            S_BL_READFILECLUS:
+                if(sdReadOk) begin
+                    sdReadEn <= `Disabled;
+                    blState <= S_BL_READFILECLUS_CHECKNEXTCLUS;
+                    debugInfo <= {8'hB6, sdReadAddr[23:0]};
+                    debugInfoAvailable <= `True;
+                end else if (sdReadDataValid) begin
+                    readByteCounter <= readByteCounter + 1;
+                    memByteCount <= memByteCount + 1;
+
+                    memWord[{memByteCount, 3'h0} +: 8] <= sdReadData;
+
+                    if (readSectorCounter <= 1 && readByteCounter > 0 && readByteCounter < 14 && memByteCount == 0) begin
+                        debugInfo <= {8'hB7, imemWAddr[23:0]};
+                        debugInfoAvailable <= `True;
+                    end
+
+                    if (memByteCount == 3)
+                    begin
+                        if (readSectorCounter <= 1 && readByteCounter < 14) begin
+                            debugInfo <= {8'hB5, memWord[23:0]};
+                            debugInfoAvailable <= `True;
+                        end
+                        
+                        if (memWordCount < wordLimit && (((readSectorCounter << 9) | readByteCounter) >> 2) <= ((currFileSize - 1) >> 2) && (((readSectorCounter << 9) | readByteCounter) >> 2) >= wordOffset)
+                        begin
+                            memWordCount <= memWordCount + 1;
+                            if (executableOrFile == `Executable) begin
+                                imemWe <= `Enabled;
+                                imemWAddr <= loadExecutableIMEMAddr + (((readSectorCounter << 9) | readByteCounter)) - (wordOffset << 2) - 3;
+                                imemWData <= {sdReadData, memWord[23:0]};
+                            end else if (executableOrFile == `File) begin
+                                dmemAEn <= `Enabled;
+                                dmemAWe <= 4'hf;
+                                dmemAAddr <= loadFileDMEMAddr + (((readSectorCounter << 9) | readByteCounter))  - (wordOffset << 2) - 3;
+                                dmemAIn <= {sdReadData, memWord[23:0]};
+                            end else if (executableOrFile == `Background) begin
+                                backgroundMemWea <= `Enabled;
+                                backgroundMemAddra <= (((readSectorCounter << 9) | readByteCounter)) >> 1;
+                                backgroundMemDina <= {sdReadData[7:4], sdReadData[2:0], memWord[23], memWord[20:17]};
+                            end
+                        end
+                    end else if (memByteCount == 1)
+                    begin
+                        if (executableOrFile == `Background) begin
+                            backgroundMemWea <= `Enabled;
+                            backgroundMemAddra <= (((readSectorCounter << 9) | readByteCounter)) >> 1;
+                            backgroundMemDina <= {sdReadData[7:4], sdReadData[2:0], memWord[7], memWord[4:1]};
+                        end
+                    end
+                end else if (sdReadDataASectorDone) begin
+                    readByteCounter <= 0;
+                    readSectorCounter <= readSectorCounter + 1;
+                end
+
+            S_BL_READFILECLUS_CHECKNEXTCLUS:
+                begin
+                    if(memWordCount < wordLimit) begin
+                        currFileSectorCounter <= readSectorCounter;
+                        nextState <= S_BL_READFILECLUS_CHECKNEXTCLUS_POST;
+                        clusNumUse <= `File;
+                        blState <= S_BL_GETNEXTCLUSNUM;
+                    end else begin
+                        debugInfo <= {8'hBf, currFileSectorCounter[23:0]};
+                        debugInfoAvailable <= `True;
+                        blState <= S_BL_READFILECLUS_POST;
+                    end
+                end
+
+            S_BL_READFILECLUS_CHECKNEXTCLUS_POST:
+                begin
+                    if (nextClusNum[30:0] != 31'hfffffff) begin
+                        debugInfo <= {8'hBE, currFileSectorCounter[23:0]};
+                        debugInfoAvailable <= `True;
+
+                        currFileClusNum <= nextClusNum;
+                        sdReadEn <= `Enabled;
+                        readByteCounter <= 0;
+                        readSectorCounter <= currFileSectorCounter;
+                        sdReadSectorNum <= (1 << BPB_SecPerClus_log2);
+                        sdReadAddr <= ((nextClusNum - 2) << BPB_SecPerClus_log2) + firstClusSec;
+                        memWord <= 0;
+                        memByteCount <= 0;
+                        blState <= S_BL_READFILECLUS;
+                    end else begin
+                        debugInfo <= {8'hBD, currFileSectorCounter[23:0]};
+                        debugInfoAvailable <= `True;
+                        blState <= S_BL_READFILECLUS_POST;
+                    end
+                end
+
+            S_BL_READFILECLUS_POST:
+                begin
+                    if(!oBootLoadOk) begin
+                        oBootLoadOk <= `True;
+                    end else begin
+                        if (executableOrFile == `Executable)
+                            oLoadExecutableOk <= `True;
+                        else if (executableOrFile == `File)
+                            oLoadFileOk <= `True;
+                        else if (executableOrFile == `Background)
+                            oLoadBackgroundFileOk <= `True;
+                    end
+                    blState <= S_BL_IDLE;
                 end
 
             
 
+            S_BL_IDLE:
+                begin
+                    blWorking <= `False;
+                    if (iLoadExecutableEn) begin
+                        loadExecutableIMEMAddr <= iLoadExecutableIMEMAddr;
+                        loadExecutableName <= iLoadExecutableName;
+                        wordLimit <= iWordLimit;
+                        wordOffset <= iWordOffset;
+                        executableOrFile <= `Executable;
+                        blState <= S_BL_LOAD;
+                        blWorking <= `True;
+                    end else if (iLoadFileEn) begin
+                        loadFileDMEMAddr <= iLoadFileDMEMAddr;
+                        loadFileName <= iLoadFileName;
+                        wordLimit <= iWordLimit;
+                        wordOffset <= iWordOffset;                        
+                        executableOrFile <= `File;
+                        blState <= S_BL_LOAD;
+                        blWorking <= `True;
+                    end else if (iLoadBackgroundFileEn) begin
+                        loadFileName <= iLoadFileName;
+                        wordLimit <= 32'hFFFFFFFF;
+                        wordOffset <= 0;
+                        executableOrFile <= `Background;
+                        blState <= S_BL_LOAD;
+                        blWorking <= `True;
+                    end
+                end
 
+            S_BL_ERROR:
+                blError <= `True;
+
+            default:
+                blState <= S_BL_RESET;
 
         endcase
 

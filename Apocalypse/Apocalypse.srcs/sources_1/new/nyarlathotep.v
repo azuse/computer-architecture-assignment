@@ -11,25 +11,28 @@ module nyarlathotep(
     input ena,
 
     input [31:0] inst,  //imemOut
-
-    input [31:0] dmemAOut,
-
-    input [4:0] debugRFAddr,
+    output cpuRunning,
+    output cpuPaused,
+    output reg [31:0] pc,   //imemRAddr
 
     output reg dmemAEn,
     output [3:0] dmemAWe,
     output reg [31:0] dmemAAddr,
     output reg [31:0] dmemAIn,
-    
-
-    output cpuRunning,
-    output reg [31:0] pc,   //imemRAddr
+    input [31:0] dmemAOut,
 
     output [31:0] imemWAddr,
     output [31:0] imemWData,
     output imemWe,
 
-    output [31:0] debugRFData
+    input [4:0] debugRFAddr,
+    output [31:0] debugRFData,
+
+    output reg [7:0] syscallFuncCode,
+    input [4:0] rfRAddr1_kn,
+    output [31:0] rfRData1,
+
+    input knWorking
 );
     assign imemWAddr = 32'h0;
     assign imemWData = 32'h0;
@@ -37,7 +40,6 @@ module nyarlathotep(
     
     reg cpuStarted;
     assign cpuRunning = (ena & cpuStarted);
-    wire cpuPaused;
 
     `include "aluHeader.vh"
 
@@ -50,7 +52,6 @@ module nyarlathotep(
     reg [4:0] rfWAddr;
     reg [31:0] rfWData;
 
-    wire [31:0] rfRData1;
     wire [31:0] rfRData2;
 
     regfile cpu_ref(
@@ -58,7 +59,7 @@ module nyarlathotep(
         .rst(reset),
         .we(rfWe),
         .cpuPaused(cpuPaused),
-        .raddr1(rfRAddr1),
+        .raddr1(knWorking ? rfRAddr1_kn : rfRAddr1),
         .raddr2(rfRAddr2),
         .waddr(rfWAddr),
         .rdata1(rfRData1),
@@ -75,7 +76,6 @@ module nyarlathotep(
     wire [31:0] aluR;
     wire [31:0] aluRX;
     wire aluBusy;
-    assign cpuPaused = aluBusy;
     wire aluZero, aluCarry, aluNegative, aluOverflow;
     ALU alu(
         .clk(~clk),
@@ -235,6 +235,7 @@ module nyarlathotep(
     /// Next PC
     wire [31:0] pcPlus4 = pc + 4;
     reg [31:0] nextPC;
+    wire [31:0] nextPC_cp0;
     wire [31:0] cp0ExecAddr;
 
     ///////////////////////
@@ -253,7 +254,8 @@ module nyarlathotep(
 
     localparam initInstAddr = 32'h00400000;
     localparam initDataAddr = 32'h10010000;
-    localparam exceptionEntry = 32'h00400004;
+
+    assign cpuPaused = aluBusy | knWorking;
 
     always @(posedge clk) begin
         if(reset == `ENABLE) begin
@@ -299,9 +301,11 @@ module nyarlathotep(
     `define SYSCALLCAUSE  5'b01000
     `define BREAKCAUSE  5'b01001
     `define TEQCAUSE 5'b01101
-    // Instruction-specific datapath
+
+    //////////////////////////////////
+    /// Instruction-specific datapath
+
     reg [4:0] bytePos;
-    //reg [31:0] exec_addr;
     
     reg [4:0] cp0Addr;
     reg [31:0] cp0WData;
@@ -355,6 +359,7 @@ module nyarlathotep(
         uaddB = 32'hxxxxxxxx;
 
         nextPC = pcPlus4;
+        syscallFuncCode = 0;
         
         if(cpuRunning) begin
             if(iAdd) begin
@@ -846,11 +851,13 @@ module nyarlathotep(
             end else if (iBreak) begin
                 cp0Exception = `ENABLE;
                 cp0Cause = {25'h0, `BREAKCAUSE, 2'h0};
-                nextPC = exceptionEntry;
+                nextPC = nextPC_cp0;
             end else if (iSyscall) begin
+                rfRAddr2 = 2;
                 cp0Exception = `ENABLE;
                 cp0Cause = {25'h0, `SYSCALLCAUSE, 2'h0};
-                nextPC = exceptionEntry;
+                nextPC = nextPC_cp0;
+                syscallFuncCode = rfRData2[7:0];
             end else if (iEret) begin
                 nextPC = cp0ExecAddr;
             end else if (iMfhi) begin
@@ -898,7 +905,7 @@ module nyarlathotep(
                     cp0Exception = `ENABLE;
                 end
                 trap = aluR[0];
-                nextPC = exceptionEntry;
+                nextPC = nextPC_cp0;
             end
         end
     end
@@ -909,9 +916,11 @@ module nyarlathotep(
     Trapezohedron cp0(
         .clk(clk),
         .rst(reset),
+        .cpuPaused(cpuPaused),
         .mfc0(iMfc0),
         .mtc0(iMtc0),
-        .pc(pcPlus4),
+        .pc(pc),
+        .nextPC(nextPC_cp0),
         .addr(cp0Addr),
         .data(cp0WData),
         .exception(cp0Exception),
@@ -922,6 +931,7 @@ module nyarlathotep(
         .PC0_out(cp0RData),
         .status(cp0Status),
         .epc_out(cp0ExecAddr)
+
     );
 
 endmodule
