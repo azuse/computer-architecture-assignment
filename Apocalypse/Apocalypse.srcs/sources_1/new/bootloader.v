@@ -538,6 +538,14 @@ module bootloader(
                             debugInfoAvailable <= `True;
                             blState <= S_BL_SCANROOT_INCREMENT;
                         end else begin
+                            if (executableOrFile == `Executable) begin
+                                ;
+                            end else if (executableOrFile == `File) begin
+                                dmemAEn <= `Enabled;
+                                dmemAWe <= (loadFileDMEMAddr != 32'h10010000) ? (4'hf) : (4'h0);
+                                dmemAAddr <= loadFileDMEMAddr - 1;
+                                dmemAIn <= currFileSize;
+                            end
                             blState <= S_BL_READFILECLUS_PRE_JUMPCLUS;
                         end
                     endcase

@@ -74,21 +74,17 @@ module kernel(
             
             blLoadExecutableEn <= `Disabled;
             blLoadFileEn <= `Disabled;
+            blLoadBackgroundFileEn <= `Disabled;
 
             canvasMemWea <= `Disabled;
             sevenSegOut <= 32'h12ABCDEF;
             initOk <= `False;
             canvasPixelCount <= 0;
-        end else if(~initOk) begin
-            if (canvasPixelCount < canvasSize) begin
-                canvasMemWea <= `Enabled;
-                canvasMemAddra <= canvasPixelCount;
-                canvasMemDina <= 0;
-                canvasPixelCount <= canvasPixelCount + 1;
-            end else begin
-                canvasMemWea <= `Disabled;
-                initOk <= `True;
-            end
+        end else if(~working && ~initOk) begin
+            working <= `True;
+            canvasPixelCount <= 0;
+            knState <= S_KN_CLEARCANVAS;
+            dmemAWe <= 0;
         end else if(working) begin
             case (knState)
                 S_KN_READV0:
@@ -133,6 +129,9 @@ module kernel(
                         knState <= S_KN_CHANGE7SEG;
                     end else if(funcCode_stored == 'h2) begin
                         knState <= S_KN_DRAWPIXEL;
+                    end else if(funcCode_stored == 'h3) begin
+                        canvasPixelCount <= 0;
+                        knState <= S_KN_CLEARCANVAS;
                     end else if(funcCode_stored == 'h8) begin
                         knState <= S_KN_WAITFORBUTTON;
                     end else if(funcCode_stored == 'h9) begin
@@ -258,6 +257,20 @@ module kernel(
                     canvasMemAddra <= {v1[24:16], v1[8:0]};
                     canvasMemDina <= {1'b1, a0[15:12], a0[10:7], a0[4:1]};
                     knState <= S_KN_DONE;
+                end
+
+                S_KN_CLEARCANVAS:
+                begin
+                    if (canvasPixelCount < canvasSize) begin
+                        canvasMemWea <= `Enabled;
+                        canvasMemAddra <= canvasPixelCount;
+                        canvasMemDina <= 0;
+                        canvasPixelCount <= canvasPixelCount + 1;
+                    end else begin
+                        canvasMemWea <= `Disabled;
+                        initOk <= `True;
+                        knState <= S_KN_DONE;
+                    end
                 end
 
                 S_KN_WAITFORBUTTON:

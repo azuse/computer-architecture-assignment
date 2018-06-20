@@ -93,7 +93,7 @@ module topmodule(
 
     reg [31:0] sevenSegOut;
 
-    always @(posedge CLK100MHZ)
+    always @(*)
     begin
         if(debugMode) begin
             sevenSegOut = sevenSegOut_debug;

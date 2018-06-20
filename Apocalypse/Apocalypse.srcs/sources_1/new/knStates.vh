@@ -21,4 +21,5 @@ localparam S_KN_READSW = 8'h14;
 localparam S_KN_DONE = 8'h20;
 localparam S_KN_READSDTOBACKGROUND = 8'h15;
 localparam S_KN_READSDTOBACKGROUND_DO = 8'h16;
+localparam S_KN_CLEARCANVAS = 8'h17;
 
